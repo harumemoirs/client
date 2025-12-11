@@ -508,7 +508,7 @@ const ContactUsPage = () => {
         <div className="col-span-12 xl:col-span-7 relative overflow-hidden min-h-[500px] xl:min-h-full">
           <div className="absolute inset-0 bg-primary-dark/20 z-10"></div>
           <Image
-            src="https://res.cloudinary.com/dwtbvdlzg/image/upload/v1764269683/contact-us-page-hero_lrvvty.jpg"
+            src="https://res.cloudinary.com/dwtbvdlzg/image/upload/v1765482920/contact-us-3rd-option_ahjgvu.jpg"
             alt="Writing and correspondence"
             fill
             className="object-cover"
