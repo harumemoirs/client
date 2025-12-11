@@ -215,36 +215,37 @@ const HomePage = () => {
 
                 <p className="text-base md:text-lg font-montserrat leading-relaxed text-primary-dark/80 mb-6 md:mb-8">
                   My name is Christina Samuel, but here I write as Christy — a
-                  name given by the people I love, a small omoide I hold close
-                  to my heart. Writing letters, poems, journals, and reflections
-                  became the place where my quiet emotions finally found a voice
-                  in a world where the kokoro — the true heart — is often
-                  misunderstood. My work comes from the shifting kisetsu
-                  (seasons) of my inner world — moments of loneliness, warmth,
-                  forgotten love, soft ache, and the gentle search for meaning.
-                  Haru Memoirs is my haru — a quiet spring where emotions bloom
-                  softly and each word becomes a small step toward healing.
+                  name tied to precious 思い出 (omoide — memories). I started
+                  this blog because speaking my feelings has never been easy;
+                  when the 心 (kokoro — heart) feels misunderstood, writing
+                  becomes gentler than words spoken aloud. My stories reflect
+                  the changing 季節 (kisetsu — seasons) within me . Through Haru
+                  Memoirs, I hope my writing comforts those who struggle to
+                  voice their emotions. This space is my 春 (haru — spring),
+                  where feelings bloom softly and the 心 (kokoro — heart) can
+                  rest.
                 </p>
 
                 <div className="space-y-4 md:space-y-6 mb-6 md:mb-8">
                   <div className="border-l-2 border-accent-warm pl-4 md:pl-6">
                     <h4 className="font-montserrat font-medium text-xs md:text-sm uppercase tracking-wider mb-2">
-                      EMOTIONAL STORYTELLING
+                      SEASONAL STORYTELLING
                     </h4>
                     <p className="text-xs leading-relaxed text-primary-dark/80">
-                      Letters, poems, and reflections shaped from the quiet
-                      emotions that cannot be spoken aloud.
+                      Stories shaped by the 季節 (kisetsu) of the heart — gentle
+                      shifts, quiet changes, and the beauty found in things that
+                      fade.
                     </p>
                   </div>
 
                   <div className="border-l-2 border-accent-cool pl-4 md:pl-6">
                     <h4 className="font-montserrat font-medium text-xs md:text-sm uppercase tracking-wider mb-2">
-                      THE INNER SEASONS
+                      MEMOIR WRITING
                     </h4>
                     <p className="text-xs leading-relaxed text-primary-dark/80">
-                      Writing drawn from the shifting kisetsu of the heart —
-                      loneliness, warmth, longing, memory, and the desire to be
-                      understood.
+                      Personal reflections that explore belonging, loneliness,
+                      understanding, and the small 思い出 (omoide) that shape
+                      who we become.
                     </p>
                   </div>
                 </div>
