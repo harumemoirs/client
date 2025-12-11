@@ -1,0 +1,133 @@
+/* Google Fonts are imported via next/font in layout.tsx */
+
+@import "tailwindcss";
+
+@theme {
+  --color-primary-dark: #2f4858;
+  --color-primary-light: #c4b39a;
+  --color-text-ui: #3a332b;
+  --color-background: #f0ebe7;
+  --color-accent-warm: #6aadbd;
+  --color-accent-cool: #6a8eae;
+  --color-heading-accent: #5B4C3A;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom font classes */
+.font-garamond {
+  font-family: var(--font-eb-garamond), "EB Garamond", serif;
+}
+
+.font-montserrat {
+  font-family: var(--font-montserrat), "Montserrat", sans-serif;
+}
+
+/* Remove browser autofill styling for all form elements */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+textarea:-webkit-autofill:active,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus,
+select:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+  -webkit-text-fill-color: inherit !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+}
+
+/* For Firefox */
+input:-moz-autofill,
+textarea:-moz-autofill,
+select:-moz-autofill {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+/* Additional support for modern browsers */
+input:autofill,
+textarea:autofill,
+select:autofill {
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: 0 0 0 1000px transparent inset !important;
+}
+
+/* Ensure text color remains consistent */
+input,
+textarea,
+select {
+  color: inherit;
+}
+
+/* Premium Scrollbar Styles - Hide scrollbars globally */
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+html,
+body,
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* Alternative: Custom thin scrollbar for premium look */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--color-primary-dark) 30%, transparent);
+  border-radius: 3px;
+  transition: background-color 0.2s ease;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--color-primary-dark) 50%, transparent);
+}
+
+/* Premium body styles */
+body {
+  overflow-x: hidden; /* Prevent horizontal scroll */
+}
+
+/* Optional: Elegant scroll fade effect */
+.scroll-fade::before,
+.scroll-fade::after {
+  content: "";
+  position: fixed;
+  left: 0;
+  right: 0;
+  height: 20px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.scroll-fade::before {
+  top: 0;
+  background: linear-gradient(to bottom, var(--color-background), transparent);
+}
+
+.scroll-fade::after {
+  bottom: 0;
+  background: linear-gradient(to top, var(--color-background), transparent);
+}
