@@ -69,9 +69,7 @@ export const baseMetadata: Metadata = {
     },
   },
   verification: {
-    google: "need google verification code from google search console", // Add your Google Search Console verification code
-    // yandex: 'your-yandex-verification-code',
-    // bing: 'your-bing-verification-code',
+    google: "AofGUUujIi9sn3ldRd1IHa8tNY2uuHSm5uusmh7_upw",
   },
 };
 
