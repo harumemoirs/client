@@ -355,6 +355,7 @@ const NewsletterPopup: React.FC<NewsletterPopupProps> = ({
   const [isVisible, setIsVisible] = useState(false);
   const [isFeedbackVisible, setIsFeedbackVisible] = useState(false);
   const [shouldRender, setShouldRender] = useState(false);
+  const [remainingCooldown, setRemainingCooldown] = useState<number>(0);
 
   // Handle popup visibility with smooth transitions
   useEffect(() => {
@@ -429,21 +430,58 @@ const NewsletterPopup: React.FC<NewsletterPopupProps> = ({
       }, 50);
     } catch (error: any) {
       console.error("Newsletter subscription error:", error);
-      // Check if it's a server error or network error
-      if (error.message && error.message.includes("Failed to subscribe")) {
+      
+      // Check if it's a rate limit error
+      if (error.isRateLimited) {
+        setRemainingCooldown(error.retryAfter || 900);
+        
+        // Set invisible first, then set status, then fade in
+        setIsFeedbackVisible(false);
+        
+        // Small delay to ensure state is updated
+        setTimeout(() => {
+          setSubmitStatus("rate-limited");
+          
+          // Update countdown
+          const interval = setInterval(() => {
+            setRemainingCooldown((prev) => {
+              const newRemaining = prev - 1;
+              if (newRemaining <= 0) {
+                clearInterval(interval);
+                setIsFeedbackVisible(false);
+                setTimeout(() => setSubmitStatus(null), 1000);
+                return 0;
+              }
+              return newRemaining;
+            });
+          }, 1000);
+          
+          // Trigger fade-in animation
+          setTimeout(() => {
+            setIsFeedbackVisible(true);
+          }, 100);
+        }, 50);
+      } else if (error.message && error.message.includes("Failed to subscribe")) {
         setSubmitStatus("server-error");
+        setIsFeedbackVisible(false);
+        setTimeout(() => {
+          setIsFeedbackVisible(true);
+          setTimeout(() => {
+            setIsFeedbackVisible(false);
+            setTimeout(() => setSubmitStatus(null), 1000);
+          }, 1000);
+        }, 50);
       } else {
         setSubmitStatus("network-error");
-      }
-      
-      setIsFeedbackVisible(false);
-      setTimeout(() => {
-        setIsFeedbackVisible(true);
+        setIsFeedbackVisible(false);
         setTimeout(() => {
-          setIsFeedbackVisible(false);
-          setTimeout(() => setSubmitStatus(null), 1000);
-        }, 1000);
-      }, 50);
+          setIsFeedbackVisible(true);
+          setTimeout(() => {
+            setIsFeedbackVisible(false);
+            setTimeout(() => setSubmitStatus(null), 1000);
+          }, 1000);
+        }, 50);
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -661,6 +699,15 @@ const NewsletterPopup: React.FC<NewsletterPopupProps> = ({
                             </span>
                             Please enter a valid email address (example:
                             name@example.com).
+                          </>
+                        ) : submitStatus === "rate-limited" ? (
+                          <>
+                            <span className="font-medium uppercase tracking-wider block mb-2">
+                              PLEASE WAIT
+                            </span>
+                            To prevent spam, please wait {Math.floor(remainingCooldown / 60)}:
+                            {String(remainingCooldown % 60).padStart(2, "0")} before
+                            subscribing again.
                           </>
                         ) : submitStatus === "server-error" ? (
                           <>

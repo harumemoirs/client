@@ -1,12 +1,36 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { MongoClient } from "mongodb";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limiter";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const mongo = new MongoClient(process.env.MONGODB_URI!);
   
 export async function POST(req: Request) {
   try {
+    // Check rate limit first
+    const clientIp = getClientIp(req);
+    const rateLimitResult = await checkRateLimit(clientIp, "contact", mongo);
+
+    if (!rateLimitResult.allowed) {
+      console.log(`[Contact API] Rate limit exceeded for IP: ${clientIp}, retryAfter: ${rateLimitResult.retryAfter}s`);
+      return NextResponse.json(
+        {
+          error: "Rate limit exceeded",
+          message: `Too many requests. Please try again in ${rateLimitResult.retryAfter} seconds.`,
+          retryAfter: rateLimitResult.retryAfter,
+        },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": rateLimitResult.retryAfter?.toString() || "900",
+          },
+        }
+      );
+    }
+
+    console.log(`[Contact API] Request allowed for IP: ${clientIp}, remaining: ${rateLimitResult.remaining}`);
+
     const { name, email, subject, message } = await req.json();
     
     if (!name || !email || !message) {
@@ -34,6 +58,7 @@ export async function POST(req: Request) {
       subject: subject || "No Subject",
       message,
       timestamp: new Date(),
+      ip: clientIp,
     });
 
     const data = await resend.emails.send({
@@ -69,3 +94,4 @@ export async function POST(req: Request) {
     await mongo.close();
   }
 }
+

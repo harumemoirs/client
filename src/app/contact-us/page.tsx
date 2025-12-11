@@ -345,12 +345,8 @@ const ContactUsPage = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<string | null>(null);
-  const [lastSubmitTime, setLastSubmitTime] = useState<number>(0);
   const [remainingCooldown, setRemainingCooldown] = useState<number>(0);
   const [isVisible, setIsVisible] = useState(false);
-
-  // Rate limiting: 60 seconds between submissions
-  const RATE_LIMIT_SECONDS = 60;
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -363,32 +359,6 @@ const ContactUsPage = () => {
   };
 
   const handleSubmit = async () => {
-    // Check rate limit
-    const currentTime = Date.now();
-    const timeSinceLastSubmit = (currentTime - lastSubmitTime) / 1000;
-
-    if (timeSinceLastSubmit < RATE_LIMIT_SECONDS && lastSubmitTime !== 0) {
-      const remainingTime = Math.ceil(RATE_LIMIT_SECONDS - timeSinceLastSubmit);
-      setRemainingCooldown(remainingTime);
-      setSubmitStatus("rate-limited");
-
-      // Update countdown
-      const interval = setInterval(() => {
-        const newRemaining = Math.ceil(
-          RATE_LIMIT_SECONDS - (Date.now() - lastSubmitTime) / 1000
-        );
-        if (newRemaining <= 0) {
-          clearInterval(interval);
-          setRemainingCooldown(0);
-          setSubmitStatus(null);
-        } else {
-          setRemainingCooldown(newRemaining);
-        }
-      }, 1000);
-
-      return;
-    }
-
     // Prevent submission if required fields are empty
     if (
       !formData.name ||
@@ -397,6 +367,14 @@ const ContactUsPage = () => {
       !formData.message
     ) {
       setSubmitStatus("error");
+      setIsVisible(false);
+      setTimeout(() => {
+        setIsVisible(true);
+        setTimeout(() => {
+          setIsVisible(false);
+          setTimeout(() => setSubmitStatus(null), 1000);
+        }, 1000);
+      }, 50);
       return;
     }
 
@@ -411,7 +389,6 @@ const ContactUsPage = () => {
       setIsVisible(false);
       
       setFormData({ name: "", email: "", subject: "", message: "" });
-      setLastSubmitTime(Date.now());
       
       // Trigger fade-in after a slight delay to allow DOM to paint
       setTimeout(() => {
@@ -431,19 +408,53 @@ const ContactUsPage = () => {
     } catch (error: any) {
       console.error("Contact form submission error:", error);
       
-      setSubmitStatus("error");
-      setIsVisible(false);
-      
-      setTimeout(() => {
-        setIsVisible(true);
+      // Check if it's a rate limit error
+      if (error?.isRateLimited || error?.response?.status === 429) {
+        const retryAfter = error?.retryAfter || error?.response?.data?.retryAfter || 900;
+        
+        setRemainingCooldown(retryAfter);
+        
+        // Set invisible first, then set status, then fade in
+        setIsVisible(false);
+        
+        // Small delay to ensure state is updated
+        setTimeout(() => {
+          setSubmitStatus("rate-limited");
+          
+          // Update countdown
+          const interval = setInterval(() => {
+            setRemainingCooldown((prev) => {
+              const newRemaining = prev - 1;
+              if (newRemaining <= 0) {
+                clearInterval(interval);
+                setIsVisible(false);
+                setTimeout(() => setSubmitStatus(null), 1000);
+                return 0;
+              }
+              return newRemaining;
+            });
+          }, 1000);
+          
+          // Trigger fade-in animation
+          setTimeout(() => {
+            setIsVisible(true);
+          }, 100);
+        }, 50);
+      } else {
+        setSubmitStatus("error");
+        setIsVisible(false);
         
         setTimeout(() => {
-          setIsVisible(false);
+          setIsVisible(true);
+          
           setTimeout(() => {
-            setSubmitStatus(null);
+            setIsVisible(false);
+            setTimeout(() => {
+              setSubmitStatus(null);
+            }, 1000);
           }, 1000);
-        }, 1000);
-      }, 50);
+        }, 50);
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -638,8 +649,9 @@ const ContactUsPage = () => {
                         <span className="font-medium uppercase tracking-wider block mb-2">
                           PLEASE WAIT
                         </span>
-                        To prevent spam, please wait {remainingCooldown} seconds
-                        before sending another message.
+                        To prevent spam, please wait {Math.floor(remainingCooldown / 60)}:
+                        {String(remainingCooldown % 60).padStart(2, "0")} before
+                        sending another message.
                       </>
                     ) : (
                       <>

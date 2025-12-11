@@ -204,6 +204,7 @@ const Newsletter = () => {
   const [isSubscribing, setIsSubscribing] = useState(false);
   const [subscribeStatus, setSubscribeStatus] = useState<string | null>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [remainingCooldown, setRemainingCooldown] = useState<number>(0);
 
   const handleSubmit = async () => {
     // Trim once and reuse
@@ -253,21 +254,60 @@ const Newsletter = () => {
       }, 50);
     } catch (error: any) {
       console.error("Newsletter subscription error:", error);
-      // Check if it's a server error or network error
-      if (error.message && error.message.includes("Failed to subscribe")) {
+      
+      // Check if it's a rate limit error
+      if (error.isRateLimited) {
+        setRemainingCooldown(error.retryAfter || 900);
+        
+        // Set invisible first, then set status, then fade in
+        setIsVisible(false);
+        
+        // Small delay to ensure state is updated
+        setTimeout(() => {
+          setSubscribeStatus("rate-limited");
+          
+          // Update countdown
+          const interval = setInterval(() => {
+            setRemainingCooldown((prev) => {
+              const newRemaining = prev - 1;
+              if (newRemaining <= 0) {
+                clearInterval(interval);
+                setIsVisible(false);
+                setTimeout(() => setSubscribeStatus(null), 1000);
+                return 0;
+              }
+              return newRemaining;
+            });
+          }, 1000);
+          
+          // Trigger fade-in animation
+          setTimeout(() => {
+            setIsVisible(true);
+          }, 100);
+        }, 50);
+      } else if (error.message && error.message.includes("Failed to subscribe")) {
         setSubscribeStatus("server-error");
+        setIsVisible(false);
+        
+        setTimeout(() => {
+          setIsVisible(true);
+          setTimeout(() => {
+            setIsVisible(false);
+            setTimeout(() => setSubscribeStatus(null), 1000);
+          }, 1000);
+        }, 50);
       } else {
         setSubscribeStatus("network-error");
-      }
-      setIsVisible(false);
-      
-      setTimeout(() => {
-        setIsVisible(true);
+        setIsVisible(false);
+        
         setTimeout(() => {
-          setIsVisible(false);
-          setTimeout(() => setSubscribeStatus(null), 1000);
-        }, 1000);
-      }, 50);
+          setIsVisible(true);
+          setTimeout(() => {
+            setIsVisible(false);
+            setTimeout(() => setSubscribeStatus(null), 1000);
+          }, 1000);
+        }, 50);
+      }
     } finally {
       setIsSubscribing(false);
     }
@@ -403,6 +443,15 @@ const Newsletter = () => {
                           </span>
                           Please enter a valid email address (example:
                           name@example.com).
+                        </>
+                      ) : subscribeStatus === "rate-limited" ? (
+                        <>
+                          <span className="font-medium uppercase tracking-wider block mb-2">
+                            PLEASE WAIT
+                          </span>
+                          To prevent spam, please wait {Math.floor(remainingCooldown / 60)}:
+                          {String(remainingCooldown % 60).padStart(2, "0")} before
+                          subscribing again.
                         </>
                       ) : subscribeStatus === "server-error" ? (
                         <>
