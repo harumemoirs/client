@@ -299,7 +299,7 @@ const BlogsPage = () => {
   const heroImages: Record<string, string> = {
     ALL: "https://res.cloudinary.com/dwtbvdlzg/image/upload/w_1200,h_800,c_fill/v1765380884/hero-1st-left_bc863k.jpg",
     LETTERS:
-      "https://res.cloudinary.com/dwtbvdlzg/image/upload/w_1200,h_800,c_fill/v1765539076/letter-hero_wosfsn.jpg",
+      "https://res.cloudinary.com/dwtbvdlzg/image/upload/w_1200,h_800,c_fill/v1765552632/lavdi_n3eyiq.jpg",
     POETRY:
       "https://res.cloudinary.com/dwtbvdlzg/image/upload/w_1200,h_800,c_fill/v1765538787/1st-tides-of-change-2ndoption_uigzqo.jpg",
     SELF_REFLECTION:
