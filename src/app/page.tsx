@@ -219,11 +219,11 @@ const HomePage = () => {
                   this blog because speaking my feelings has never been easy;
                   when the 心 (kokoro — heart) feels misunderstood, writing
                   becomes gentler than words spoken aloud. My stories reflect
-                  the changing 季節 (kisetsu — seasons) within me . Through Haru
-                  Memoirs, I hope my writing comforts those who struggle to
-                  voice their emotions. This space is my 春 (haru — spring),
-                  where feelings bloom softly and the 心 (kokoro — heart) can
-                  rest.
+                  the changing 季節 (kisetsu — seasons) within me. Through Haru
+                  Memoirs, I hope my writing brings comfort to those who
+                  struggle to voice their emotions. This space is my 春 (haru —
+                  spring), where feelings bloom softly and the 心 (kokoro —
+                  heart) can rest.
                 </p>
 
                 <div className="space-y-4 md:space-y-6 mb-6 md:mb-8">
