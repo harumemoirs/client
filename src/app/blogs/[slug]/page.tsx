@@ -16,7 +16,7 @@ import { togglePoemLike, checkPoemLike } from "@/functions/services/like/poem";
 
 const IndividualBlogPage = () => {
   const params = useParams();
-  const blogId = params?.id as string;
+  const blogSlug = params?.slug as string;
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -27,16 +27,16 @@ const IndividualBlogPage = () => {
   const [blogError, setBlogError] = useState<string | null>(null);
   const [relatedPosts, setRelatedPosts] = useState<any[]>([]);
 
-  // Fetch blog data - fetch all blogs and filter by ID
+  // Fetch blog data - fetch all blogs and filter by slug
   useEffect(() => {
     const fetchBlog = async () => {
-      if (!blogId) return;
+      if (!blogSlug) return;
       
       try {
         setBlogLoading(true);
         setBlogError(null);
         
-        // Fetch all blogs from all categories and find the one matching ID
+        // Fetch all blogs from all categories and find the one matching slug
         const [blogsRes, journalsRes, lettersRes, poemsRes] = await Promise.allSettled([
           getAllBlogs(1, 100), // Fetch more to ensure we get the blog
           getAllJournals(1, 100),
@@ -50,7 +50,7 @@ const IndividualBlogPage = () => {
         // Search in blogs (self-reflection)
         if (blogsRes.status === "fulfilled") {
           const blogs = blogsRes.value.blogs || blogsRes.value.data || [];
-          foundBlog = blogs.find((b: any) => b.id === blogId);
+          foundBlog = blogs.find((b: any) => b.slug === blogSlug);
           if (foundBlog) {
             contentType = "SELF_REFLECTION";
           }
@@ -59,7 +59,7 @@ const IndividualBlogPage = () => {
         // Search in journals if not found
         if (!foundBlog && journalsRes.status === "fulfilled") {
           const journals = journalsRes.value.journals || journalsRes.value.data || [];
-          foundBlog = journals.find((j: any) => j.id === blogId);
+          foundBlog = journals.find((j: any) => j.slug === blogSlug);
           if (foundBlog) {
             contentType = "JOURNALS";
           }
@@ -68,7 +68,7 @@ const IndividualBlogPage = () => {
         // Search in letters if not found
         if (!foundBlog && lettersRes.status === "fulfilled") {
           const letters = lettersRes.value.letters || lettersRes.value.data || [];
-          foundBlog = letters.find((l: any) => l.id === blogId);
+          foundBlog = letters.find((l: any) => l.slug === blogSlug);
           if (foundBlog) {
             contentType = "LETTERS";
           }
@@ -77,7 +77,7 @@ const IndividualBlogPage = () => {
         // Search in poems if not found
         if (!foundBlog && poemsRes.status === "fulfilled") {
           const poems = poemsRes.value.poems || poemsRes.value.data || [];
-          foundBlog = poems.find((p: any) => p.id === blogId);
+          foundBlog = poems.find((p: any) => p.slug === blogSlug);
           if (foundBlog) {
             contentType = "POETRY";
           }
@@ -120,7 +120,7 @@ const IndividualBlogPage = () => {
     };
 
     fetchBlog();
-  }, [blogId]);
+  }, [blogSlug]);
 
   // NOTE: Like count is now initialized from the checkLike API response, not from blog.likes
   // which may be stale/cached data from the main blog API
@@ -138,8 +138,8 @@ const IndividualBlogPage = () => {
 
     // Check localStorage FIRST for instant feedback
     let hasLocalLike = false;
-    if (fingerprint && blogId) {
-      const likedKey = `hm_liked_${fingerprint}_${blogId}`;
+    if (fingerprint && blog?.id) {
+      const likedKey = `hm_liked_${fingerprint}_${blog.id}`;
       hasLocalLike = localStorage.getItem(likedKey) === 'true';
       if (hasLocalLike) {
         console.log('Found in localStorage: User has liked this post');
@@ -149,25 +149,25 @@ const IndividualBlogPage = () => {
 
     // Then verify with API in background
     const fetchLikeData = async () => {
-      if (!blogId || !blog || !fingerprint) return;
+      if (!blog?.id || !fingerprint) return;
 
       try {
         let status;
         
-        console.log('🔍 Checking like status with API:', { blogId, blogType: blog.type });
+        console.log('🔍 Checking like status with API:', { blogId: blog.id, blogType: blog.type });
         
         switch (blog.type) {
           case "blog":
-            status = await checkBlogLike(blogId, fingerprint);
+            status = await checkBlogLike(blog.id, fingerprint);
             break;
           case "journal":
-            status = await checkJournalLike(blogId, fingerprint);
+            status = await checkJournalLike(blog.id, fingerprint);
             break;
           case "letter":
-            status = await checkLetterLike(blogId, fingerprint);
+            status = await checkLetterLike(blog.id, fingerprint);
             break;
           case "poem":
-            status = await checkPoemLike(blogId, fingerprint);
+            status = await checkPoemLike(blog.id, fingerprint);
             break;
           default:
             return;
@@ -184,11 +184,11 @@ const IndividualBlogPage = () => {
         if (liked) {
           // API confirms liked - update state and localStorage
           setIsLiked(true);
-          const likedKey = `hm_liked_${fingerprint}_${blogId}`;
+          const likedKey = `hm_liked_${fingerprint}_${blog.id}`;
           localStorage.setItem(likedKey, 'true');
         } else {
           // Re-check localStorage to see if user liked while API was in flight
-          const likedKey = `hm_liked_${fingerprint}_${blogId}`;
+          const likedKey = `hm_liked_${fingerprint}_${blog.id}`;
           const currentLocalLike = localStorage.getItem(likedKey) === 'true';
           
           if (!currentLocalLike && !hasLocalLike) {
@@ -208,7 +208,7 @@ const IndividualBlogPage = () => {
     if (blog && fingerprint) {
       fetchLikeData();
     }
-  }, [blogId, blog]);
+  }, [blog]);
 
   if (blogLoading) {
     return (
@@ -254,7 +254,7 @@ const IndividualBlogPage = () => {
     setLikeCount((prev) => prev + 1);
     
     // Save to localStorage immediately
-    const likedKey = `hm_liked_${fingerprint}_${blogId}`;
+    const likedKey = `hm_liked_${fingerprint}_${blog.id}`;
     localStorage.setItem(likedKey, 'true');
 
     try {
@@ -262,16 +262,16 @@ const IndividualBlogPage = () => {
       
       switch (blog.type) {
         case "blog":
-          result = await toggleBlogLike(blogId, fingerprint);
+          result = await toggleBlogLike(blog.id, fingerprint);
           break;
         case "journal":
-          result = await toggleJournalLike(blogId, fingerprint);
+          result = await toggleJournalLike(blog.id, fingerprint);
           break;
         case "letter":
-          result = await toggleLetterLike(blogId, fingerprint);
+          result = await toggleLetterLike(blog.id, fingerprint);
           break;
         case "poem":
-          result = await togglePoemLike(blogId, fingerprint);
+          result = await togglePoemLike(blog.id, fingerprint);
           break;
       }
 
@@ -450,7 +450,7 @@ const IndividualBlogPage = () => {
                 {relatedPosts.map((post) => (
                   <Link
                     key={post.id}
-                    href={`/blogs/${post.id}`}
+                    href={`/blogs/${post.slug}`}
                     className="group block"
                   >
                     <div className="border-l-2 border-primary-light/50 group-hover:border-primary-dark pl-6 transition-all duration-300">

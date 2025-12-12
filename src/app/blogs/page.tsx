@@ -468,7 +468,7 @@ const BlogsPage = () => {
                   </div>
 
                   <h3 className="text-xl md:text-2xl font-garamond font-light mb-4 group-hover:text-primary-dark transition-colors duration-300">
-                    <Link href={`/blogs/${blog.id}`}>{blog.title || "Untitled"}</Link>
+                    <Link href={`/blogs/${blog.slug}`}>{blog.title || "Untitled"}</Link>
                   </h3>
 
                   <p className="text-sm font-montserrat leading-relaxed text-primary-dark/80 mb-6">
@@ -480,7 +480,7 @@ const BlogsPage = () => {
                       <span>{new Date(blog.createdAt || blog.date || Date.now()).toLocaleDateString()}</span>
                     </div>
                     <Link
-                      href={`/blogs/${blog.id}`}
+                      href={`/blogs/${blog.slug}`}
                       className="text-xs font-montserrat uppercase tracking-wider text-primary-dark/60 group-hover:text-primary-dark transition-colors duration-300"
                     >
                       READ MORE →

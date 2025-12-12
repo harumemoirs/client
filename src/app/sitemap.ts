@@ -71,7 +71,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       if (!Array.isArray(items)) return [];
 
       return items.map((item: any) => ({
-        url: `${baseUrl}/blogs/${item.id}`, // Using unique item.id instead of adminId
+        url: `${baseUrl}/blogs/${item.slug}`, // Using slug for SEO-friendly URLs
         lastModified: item.date
           ? new Date(item.date).toISOString()
           : currentDate,

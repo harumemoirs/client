@@ -17,7 +17,7 @@ export const getAllBlogs = async (page = 1, limit = 9) => {
 
 export const getBlogBySlug = async (slug: string) => {
   try {
-    const res = await http.get(`/api/v2/blogs/by-slug/${slug}`);
+    const res = await http.get(`/api/v2/blog/by-slug/${slug}`);
     return res.data;  
   } catch (error) {
     console.error("Error fetching blog ", error);
@@ -27,7 +27,7 @@ export const getBlogBySlug = async (slug: string) => {
 
 export const getBlogById = async (id:string) => {
   try {
-    const res = await http.get(`/api/v2/blogs/${id}`)
+    const res = await http.get(`/api/v2/blog/${id}`)
     return res.data
   } catch (error) {
     console.error('Error fetching blog',error)
