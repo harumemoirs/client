@@ -12,29 +12,29 @@ interface FAQ {
 // Move faqs array outside component to prevent recreation on each render
 const faqs: FAQ[] = [
   {
-    question: "WHAT INSPIRES YOUR COASTAL WRITING?",
+    question: "WHAT INSPIRES YOUR WRITING?",
     answer:
-      "The Malabar Coast has been my home and muse for decades. Growing up surrounded by ancient spice routes, monsoon rhythms, and multi-generational stories has deeply influenced my perspective. I draw inspiration from the intersection of tradition and modernity, the way old stories echo in contemporary experiences.",
+      "The quiet seasons of the heart (kokoro) are my muse. I draw inspiration from moments of loneliness, the comfort found in stillness, and the gentle hope that blooms like spring (haru) after a long winter.",
   },
   {
-    question: "HOW DO YOU APPROACH MEMOIR WRITING?",
+    question: "WHY THE NAME 'HARU MEMOIRS'?",
     answer:
-      "I believe memoir is not just personal history, but cultural archaeology. My approach involves layering family narratives with historical context, exploring how individual stories reflect broader social and cultural shifts. Each memoir becomes a bridge between the intimate and the universal.",
+      "Haru means 'Spring' in Japanese, representing renewal and warmth. It's also the name of my cat, who taught me about quiet comfort. This space is a memoir of my journey toward healing, like spring returning to a frozen heart.",
   },
   {
-    question: "WHAT CAN I EXPECT FROM YOUR WORKSHOPS?",
+    question: "WHO IS YOUR WRITING FOR?",
     answer:
-      "My workshops focus on uncovering your unique voice and perspective. We explore techniques for capturing sensory memories, structuring personal narratives, and weaving cultural context into individual stories. Sessions are intimate, collaborative, and designed to help you discover the stories only you can tell.",
+      "It is for anyone who feels unseen or finds it hard to speak their feelings aloud. I hope my letters and poems provide a voice for your own silent emotions.",
   },
   {
-    question: "DO YOU WORK WITH INTERNATIONAL WRITERS?",
+    question: "DO YOU OFFER WORKSHOPS?",
     answer:
-      "Absolutely. While my work is rooted in coastal Indian traditions, the themes of heritage, displacement, and cultural identity resonate globally. I offer virtual consultations and workshops for writers worldwide who are exploring their own cultural narratives and family stories.",
+      "Yes, I focus on helping others express their inner world through writing. We explore how to turn feelings into words, finding clarity and comfort in the process.",
   },
   {
-    question: "WHAT'S YOUR CURRENT WRITING PROJECT?",
+    question: "WHAT ARE YOU WRITING NOW?",
     answer:
-      "I'm completing a memoir collection titled 'Salt & Stories' that explores three generations of women in my family against the backdrop of changing coastal Kerala. The book examines how place shapes identity and how stories travel through time and migration.",
+      "I am constantly documenting the shifting seasons of life—capturing the 'mono no aware' (the pathos of things) and sharing small steps toward emotional growth.",
   },
 ];
 
@@ -164,11 +164,11 @@ const AboutUsPage: React.FC = () => {
           {/* Header */}
           <div className="p-6 md:p-8 lg:p-12 xl:p-16 border-b border-primary-light/30">
             <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-8xl font-garamond font-light tracking-wider break-words max-w-xs sm:max-w-none">
-              MALABAR MEMOIRS BY CHRISTINA
+              HARU MEMOIRS
             </h1>
             <div className="mt-4 md:mt-6">
               <span className="text-xs md:text-sm font-montserrat uppercase tracking-widest text-primary-dark">
-                From the coast, writing my way home
+                Sharing the quiet seasons of the heart
               </span>
             </div>
           </div>
@@ -181,7 +181,7 @@ const AboutUsPage: React.FC = () => {
                 <p className="text-xs leading-relaxed text-primary-dark/80">
                   Welcome to
                   <br />
-                  Malabar Memoirs
+                  Haru Memoirs
                   <br />
                   Stories & Essays
                 </p>
@@ -247,7 +247,7 @@ const AboutUsPage: React.FC = () => {
                 <span className="text-heading-accent">CHRISTY</span>
               </h2>
               <p className="text-sm font-montserrat leading-relaxed mb-6 md:mb-8">
-                My name is Christina Samuel, but here I write as Christy — a name given by the people I love, a small 思い出 (omoide) I carry close to my heart. I started this blog because I've never been good at speaking my feelings; in a world where the 心 (kokoro) — the true heart — is so often misunderstood, expressing yourself can feel almost impossible, so I began writing, turning quiet emotions into letters, poems, journals, and reflections, hoping my words might help someone else feel seen.
+                My name is Christina Samuel, but here I write as Christy — a name given by the people I love, a small 思い出 (omoide) I carry close to my heart. I started this blog because I’ve never been good at speaking my feelings; in a world where the 心 (kokoro) — the true heart — is so often misunderstood, expressing yourself can feel almost impossible, so I began writing, turning quiet emotions into letters, poems, journals, and reflections, hoping my words might help someone else feel seen.
               </p>
               <p className="text-sm font-montserrat leading-relaxed mb-6 md:mb-8">
                 Most of what I write comes from the shifting 季節 (kisetsu) of my inner world — moments of loneliness and sudden warmth, misunderstandings and the longing to be understood, forgotten love, soft ache, and the gentle search for meaning — sometimes about a person, sometimes about life, and sometimes simply about myself.
@@ -275,7 +275,8 @@ const AboutUsPage: React.FC = () => {
           </h3>
           <div className="space-y-6 md:space-y-8 max-w-sm sm:max-w-none">
             <div className="border-l-2 border-primary-dark pl-4 md:pl-6">
-              <p className="text-xs leading-relaxed text-primary-dark/80">
+              <p className="text-xs leading-relaxed text-primary-dark/80 whitespace-pre-line">
+                Christy Samuel
                 A writer of letters, poems, and reflections, sharing the quiet seasons (季節 — kisetsu) of the heart (心 — kokoro). Here, words become gentle steps toward understanding, comfort, and growth — a space where emotions bloom softly like 春 (haru).
               </p>
             </div>
@@ -285,7 +286,7 @@ const AboutUsPage: React.FC = () => {
                 EARLY SEASONS
               </h4>
               <p className="text-xs leading-relaxed text-primary-dark/80">
-                I don't have many warm childhood memories; I grew up mostly in loneliness, learning early how a quiet 心 (kokoro) can be misunderstood. Yet even in that stillness, there was a soft 幽玄 (yūgen) — a hidden beauty — in the small things I held close. I found comfort in Japanese culture, in distant 季節 (kisetsu) that felt more like home than the world around me, and in the gentle presence of my cat Haru, who brought me the only warmth I understood.
+                I don’t have many warm childhood memories; I grew up mostly in loneliness, learning early how a quiet 心 (kokoro) can be misunderstood. Yet even in that stillness, there was a soft 幽玄 (yūgen) — a hidden beauty — in the small things I held close. I found comfort in Japanese culture, in distant 季節 (kisetsu) that felt more like home than the world around me, and in the gentle presence of my cat Haru, who brought me the only warmth I understood.
               </p>
             </div>
 
@@ -294,7 +295,7 @@ const AboutUsPage: React.FC = () => {
                 物の哀れ (MONO NO AWARE)
               </h4>
               <p className="text-xs leading-relaxed text-primary-dark/80">
-                The ache that stayed with me is the tender 物の哀れ (mono no aware) of growing up unseen — the bittersweet truth that everything fades, yet leaves a trace. Those early seasons shaped me, and now I write to give voice to the feelings my younger self never knew how to speak.
+                I was a quiet, inexpressive child who loved every season for its flaws and colors, noticing differences in weather and time that others never saw. The ache that stayed with me is the tender 物の哀れ (mono no aware) of growing up unseen — the bittersweet truth that everything fades, yet leaves a trace. Those early seasons shaped me, and now I write to give voice to the feelings my younger self never knew how to speak.
               </p>
             </div>
           </div>
@@ -327,19 +328,19 @@ const AboutUsPage: React.FC = () => {
               </h3>
               <div className="space-y-3 md:space-y-4">
                 <div className="flex justify-between items-center py-2 border-b border-primary-light/30">
-                  <span className="text-xs md:text-sm">COASTAL MEMORIES</span>
+                  <span className="text-xs md:text-sm">SEASONS OF THE HEART</span>
                   <span className="text-xs text-primary-dark/60">1</span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-primary-light/30">
-                  <span className="text-xs md:text-sm">FAMILY STORIES</span>
+                  <span className="text-xs md:text-sm">LETTERS TO NO ONE</span>
                   <span className="text-xs text-primary-dark/60">2</span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-primary-light/30">
-                  <span className="text-xs md:text-sm">CULTURAL ESSAYS</span>
+                  <span className="text-xs md:text-sm">INNER REFLECTIONS</span>
                   <span className="text-xs text-primary-dark/60">3</span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-primary-light/30">
-                  <span className="text-xs md:text-sm">TRAVEL NARRATIVES</span>
+                  <span className="text-xs md:text-sm">POEMS OF LONGING</span>
                   <span className="text-xs text-primary-dark/60">4</span>
                 </div>
               </div>
@@ -351,11 +352,11 @@ const AboutUsPage: React.FC = () => {
               </h3>
               <p className="text-xs leading-relaxed text-primary-dark/80 mb-4">
                 Featured in various literary magazines and journals, exploring
-                themes of heritage, identity, and place.
+                themes of longing, comfort, and the quiet heart.
               </p>
               <p className="text-xs leading-relaxed text-primary-dark/80">
-                Currently working on a memoir collection celebrating the rich
-                cultural tapestry of the Malabar region.
+                Currently working on a memoir collection celebrating the gentle
+                blooming of emotions in the Haru Memoirs collection.
               </p>
             </div>
           </div>
@@ -372,9 +373,9 @@ const AboutUsPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mb-8 lg:mb-12 max-w-2xl sm:max-w-none lg:max-w-none">
             <div>
               <p className="text-xs font-montserrat leading-relaxed mb-6 md:mb-8">
-                Offering personalized writing workshops, memoir consultations,
-                and cultural storytelling sessions for those looking to capture
-                their own heritage narratives.
+                Offering personalized journaling workshops, reflection sessions,
+                and emotional storytelling sessions for those looking to capture
+                the unspoken languages of their heart.
               </p>
 
               <div className="bg-primary-dark/90 p-4 md:p-6 text-white overflow-hidden relative">
@@ -396,21 +397,21 @@ const AboutUsPage: React.FC = () => {
             <div className="space-y-4 md:space-y-6">
               <div>
                 <h4 className="font-montserrat font-medium text-xs md:text-sm uppercase tracking-wider mb-2">
-                  MEMOIR GUIDANCE
+                  JOURNALING GUIDANCE
                 </h4>
                 <p className="text-xs leading-relaxed text-primary-dark/80">
-                  Personal consultations for aspiring memoirists looking to
-                  craft their family stories.
+                  Personal consultations for those looking to give voice to their
+                  inner feelings.
                 </p>
               </div>
 
               <div>
                 <h4 className="font-montserrat font-medium text-xs md:text-sm uppercase tracking-wider mb-2">
-                  CULTURAL RESEARCH
+                  EMOTIONAL EXPLORATION
                 </h4>
                 <p className="text-xs leading-relaxed text-primary-dark/80">
-                  Collaborative research projects exploring regional histories
-                  and traditions.
+                  Collaborative sessions exploring the landscapes of our inner
+                  worlds.
                 </p>
               </div>
             </div>
@@ -421,8 +422,8 @@ const AboutUsPage: React.FC = () => {
                   STORYTELLING
                 </h4>
                 <p className="text-xs leading-relaxed text-primary-dark/80">
-                  Live storytelling sessions celebrating coastal heritage and
-                  family traditions.
+                  Live readings sharing letters, poems, and the journey of
+                  healing and self-discovery.
                 </p>
               </div>
 
@@ -431,8 +432,8 @@ const AboutUsPage: React.FC = () => {
                   WRITING RETREATS
                 </h4>
                 <p className="text-xs leading-relaxed text-primary-dark/80">
-                  Immersive writing experiences along the Malabar Coast for
-                  creative inspiration.
+                  Immersive writing experiences designed to help your inner
+                  seasons bloom.
                 </p>
               </div>
             </div>
@@ -441,7 +442,7 @@ const AboutUsPage: React.FC = () => {
       </div>
 
       {/* FAQ Accordion Section */}
-      <FAQAccordion />
+      {/* <FAQAccordion /> */}
 
       {/* Contact Section */}
       <div className="grid grid-cols-12 border-t border-primary-light/30">
@@ -470,11 +471,11 @@ const AboutUsPage: React.FC = () => {
           <div className="absolute inset-0 bg-[#5b4c3a]/40 flex items-end p-6 md:p-8 lg:p-12 xl:p-16 z-10">
             <div>
               <p className="text-xs font-montserrat uppercase tracking-wider mb-4">
-                CONNECT WITH CHRISTINA
+                CONNECT WITH CHRISTY
               </p>
               <p className="text-xs md:text-sm leading-relaxed opacity-90">
                 Share your story, discuss potential collaborations, or learn
-                more about coastal memoir writing.
+                more about expressive journaling and healing.
               </p>
             </div>
           </div>
