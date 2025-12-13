@@ -183,7 +183,9 @@ const AboutUsPage: React.FC = () => {
                     <br />
                     Haru Memoirs
                     <br />
-                    Stories & Essays
+                    Seasons turn within, quiet words
+                    <br />
+                    find their way home — season lingers in ink.
                   </p>
                 </div>
 
