@@ -442,7 +442,7 @@ const AboutUsPage: React.FC = () => {
       </div>
 
       {/* FAQ Accordion Section */}
-      {/* <FAQAccordion /> */}
+      <FAQAccordion />
 
       {/* Contact Section */}
       <div className="grid grid-cols-12 border-t border-primary-light/30">
