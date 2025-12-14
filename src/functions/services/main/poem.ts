@@ -1,5 +1,4 @@
 import http from "../../api/http";
- 
 
 export const getAllPoems = async (page = 1, limit = 9) => {
   try {
@@ -17,19 +16,19 @@ export const getAllPoems = async (page = 1, limit = 9) => {
 export const getPoemBySlug = async (slug: string) => {
   try {
     const res = await http.get(`/api/v2/poem/by-slug/${slug}`);
-    return res.data;  
+    return res.data;
   } catch (error) {
     console.error("Error fetching poem ", error);
     throw error;
   }
 };
 
-export const getPoemById = async (id:string) => {
+export const getPoemById = async (id: string) => {
   try {
-    const res = await http.get(`/api/v2/poem/${id}`)
-    return res.data
+    const res = await http.get(`/api/v2/poem/${id}`);
+    return res.data;
   } catch (error) {
-    console.error('Error fetching poem',error)
-    throw error
+    console.error("Error fetching poem", error);
+    throw error;
   }
-}
+};

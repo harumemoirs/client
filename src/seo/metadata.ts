@@ -71,7 +71,10 @@ export const baseMetadata: Metadata = {
   verification: {
     google: "AofGUUujIi9sn3ldRd1IHa8tNY2uuHSm5uusmh7_upw",
   },
-  // Icons are handled via file-based metadata (icon.svg and apple-icon.png in app directory)
+  icons: {
+    icon: "/icon.svg",
+    apple: "/apple-icon.png",
+  },
 };
 
 /**

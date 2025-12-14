@@ -10,8 +10,14 @@ import { getAllJournals } from "@/functions/services/main/journal";
 import { getAllLetters } from "@/functions/services/main/letter";
 import { getAllPoems } from "@/functions/services/main/poem";
 import { toggleBlogLike, checkBlogLike } from "@/functions/services/like/blog";
-import { toggleJournalLike, checkJournalLike } from "@/functions/services/like/journal";
-import { toggleLetterLike, checkLetterLike } from "@/functions/services/like/letter";
+import {
+  toggleJournalLike,
+  checkJournalLike,
+} from "@/functions/services/like/journal";
+import {
+  toggleLetterLike,
+  checkLetterLike,
+} from "@/functions/services/like/letter";
 import { togglePoemLike, checkPoemLike } from "@/functions/services/like/poem";
 
 const IndividualBlogPage = () => {
@@ -20,7 +26,7 @@ const IndividualBlogPage = () => {
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [loading, setLoading] = useState(false);
-  
+
   // API states
   const [blog, setBlog] = useState<any>(null);
   const [blogLoading, setBlogLoading] = useState(true);
@@ -31,18 +37,19 @@ const IndividualBlogPage = () => {
   useEffect(() => {
     const fetchBlog = async () => {
       if (!blogSlug) return;
-      
+
       try {
         setBlogLoading(true);
         setBlogError(null);
-        
+
         // Fetch all blogs from all categories and find the one matching slug
-        const [blogsRes, journalsRes, lettersRes, poemsRes] = await Promise.allSettled([
-          getAllBlogs(1, 100), // Fetch more to ensure we get the blog
-          getAllJournals(1, 100),
-          getAllLetters(1, 100),
-          getAllPoems(1, 100),
-        ]);
+        const [blogsRes, journalsRes, lettersRes, poemsRes] =
+          await Promise.allSettled([
+            getAllBlogs(1, 100), // Fetch more to ensure we get the blog
+            getAllJournals(1, 100),
+            getAllLetters(1, 100),
+            getAllPoems(1, 100),
+          ]);
 
         let foundBlog = null;
         let contentType = "";
@@ -58,7 +65,8 @@ const IndividualBlogPage = () => {
 
         // Search in journals if not found
         if (!foundBlog && journalsRes.status === "fulfilled") {
-          const journals = journalsRes.value.journals || journalsRes.value.data || [];
+          const journals =
+            journalsRes.value.journals || journalsRes.value.data || [];
           foundBlog = journals.find((j: any) => j.slug === blogSlug);
           if (foundBlog) {
             contentType = "JOURNALS";
@@ -67,7 +75,8 @@ const IndividualBlogPage = () => {
 
         // Search in letters if not found
         if (!foundBlog && lettersRes.status === "fulfilled") {
-          const letters = lettersRes.value.letters || lettersRes.value.data || [];
+          const letters =
+            lettersRes.value.letters || lettersRes.value.data || [];
           foundBlog = letters.find((l: any) => l.slug === blogSlug);
           if (foundBlog) {
             contentType = "LETTERS";
@@ -107,9 +116,9 @@ const IndividualBlogPage = () => {
         setBlog({
           ...foundBlog,
           category: contentType,
-          type: type
+          type: type,
         });
-        
+
         setRelatedPosts([]);
       } catch (err: any) {
         console.error("Error fetching content:", err);
@@ -133,16 +142,16 @@ const IndividualBlogPage = () => {
     if (blog?.likeCount !== undefined || blog?.likes !== undefined) {
       const initialCount = parseInt(blog.likeCount || blog.likes || "0");
       setLikeCount(initialCount);
-      console.log('📊 Initial like count from blog data:', initialCount);
+      console.log("📊 Initial like count from blog data:", initialCount);
     }
 
     // Check localStorage FIRST for instant feedback
     let hasLocalLike = false;
     if (fingerprint && blog?.id) {
       const likedKey = `hm_liked_${fingerprint}_${blog.id}`;
-      hasLocalLike = localStorage.getItem(likedKey) === 'true';
+      hasLocalLike = localStorage.getItem(likedKey) === "true";
       if (hasLocalLike) {
-        console.log('Found in localStorage: User has liked this post');
+        console.log("Found in localStorage: User has liked this post");
         setIsLiked(true);
       }
     }
@@ -153,9 +162,12 @@ const IndividualBlogPage = () => {
 
       try {
         let status;
-        
-        console.log('🔍 Checking like status with API:', { blogId: blog.id, blogType: blog.type });
-        
+
+        console.log("🔍 Checking like status with API:", {
+          blogId: blog.id,
+          blogType: blog.type,
+        });
+
         switch (blog.type) {
           case "blog":
             status = await checkBlogLike(blog.id, fingerprint);
@@ -173,31 +185,36 @@ const IndividualBlogPage = () => {
             return;
         }
 
-        console.log('API Response:', status);
+        console.log("API Response:", status);
 
         const liked = status?.liked ?? status?.isLiked ?? false;
-        const count = status?.likeCount ?? status?.likes ?? status?.totalLikes ?? status?.count ?? 0;
-        
-        console.log('Parsed:', { liked, count, hasLocalLike });
-        
+        const count =
+          status?.likeCount ??
+          status?.likes ??
+          status?.totalLikes ??
+          status?.count ??
+          0;
+
+        console.log("Parsed:", { liked, count, hasLocalLike });
+
         // IMPORTANT: Only update if API explicitly confirms, or if there's no localStorage value
         if (liked) {
           // API confirms liked - update state and localStorage
           setIsLiked(true);
           const likedKey = `hm_liked_${fingerprint}_${blog.id}`;
-          localStorage.setItem(likedKey, 'true');
+          localStorage.setItem(likedKey, "true");
         } else {
           // Re-check localStorage to see if user liked while API was in flight
           const likedKey = `hm_liked_${fingerprint}_${blog.id}`;
-          const currentLocalLike = localStorage.getItem(likedKey) === 'true';
-          
+          const currentLocalLike = localStorage.getItem(likedKey) === "true";
+
           if (!currentLocalLike && !hasLocalLike) {
-             // API says not liked AND we don't have it in localStorage (initially or currently) - set to false
-             setIsLiked(false);
+            // API says not liked AND we don't have it in localStorage (initially or currently) - set to false
+            setIsLiked(false);
           }
         }
         // If API says false but localStorage says true - KEEP localStorage (API might be wrong)
-        
+
         if (count > 0) setLikeCount(count);
       } catch (error) {
         console.error("❌ API check failed:", error);
@@ -252,14 +269,14 @@ const IndividualBlogPage = () => {
     // setLoading(true); // Don't show loading state for optimistic update
     setIsLiked(true);
     setLikeCount((prev) => prev + 1);
-    
+
     // Save to localStorage immediately
     const likedKey = `hm_liked_${fingerprint}_${blog.id}`;
-    localStorage.setItem(likedKey, 'true');
+    localStorage.setItem(likedKey, "true");
 
     try {
       let result;
-      
+
       switch (blog.type) {
         case "blog":
           result = await toggleBlogLike(blog.id, fingerprint);
@@ -276,25 +293,25 @@ const IndividualBlogPage = () => {
       }
 
       const serverCount = result?.likeCount ?? result?.likes;
-      if (typeof serverCount === 'number') {
+      if (typeof serverCount === "number") {
         setLikeCount(serverCount);
       }
-      console.log('✅ Like successful!');
+      console.log("✅ Like successful!");
     } catch (error: any) {
       console.error("Like error:", error);
-      
+
       // If error says "already liked", keep the liked state
-      const errorMsg = error?.message?.toLowerCase() || '';
-      if (errorMsg.includes('already liked')) {
-        console.log('✅ Already liked - keeping liked state');
+      const errorMsg = error?.message?.toLowerCase() || "";
+      if (errorMsg.includes("already liked")) {
+        console.log("✅ Already liked - keeping liked state");
         return; // Don't revert
       }
-      
+
       // Otherwise revert
       setIsLiked(false);
       setLikeCount((prev) => Math.max(0, prev - 1));
       localStorage.removeItem(likedKey);
-    } 
+    }
     // finally {
     //   setLoading(false);
     // }
@@ -386,7 +403,8 @@ const IndividualBlogPage = () => {
                   </div>
                 </div>
                 <p className="text-xs leading-relaxed text-primary-dark/80">
-                  Writer of letters, poems, and reflections, sharing the quiet seasons of the heart.
+                  Writer of letters, poems, and reflections, sharing the quiet
+                  seasons of the heart.
                 </p>
               </div>
             </div>
@@ -397,7 +415,11 @@ const IndividualBlogPage = () => {
         <div className="col-span-12 xl:col-span-7 relative overflow-hidden">
           <div className="relative h-[50vh] xl:h-full overflow-hidden">
             <Image
-              src={blog.imageUrls?.[0] || blog.image || "https://res.cloudinary.com/dwtbvdlzg/image/upload/v1765380884/hero-1st-left_bc863k.jpg"}
+              src={
+                blog.imageUrls?.[0] ||
+                blog.image ||
+                "https://res.cloudinary.com/dwtbvdlzg/image/upload/v1765380884/hero-1st-left_bc863k.jpg"
+              }
               alt={blog.title || "Untitled"}
               fill
               className="object-cover"
@@ -410,10 +432,12 @@ const IndividualBlogPage = () => {
             <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12 xl:p-12 text-white">
               <div className="max-w-4xl">
                 <p className="text-xs font-montserrat uppercase tracking-wider opacity-90 mb-2">
-                  {new Date(blog.createdAt || blog.date || Date.now()).toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
+                  {new Date(
+                    blog.createdAt || blog.date || Date.now()
+                  ).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
                   })}
                 </p>
                 <h1 className="text-3xl md:text-5xl xl:text-6xl font-garamond font-light leading-tight">
@@ -431,10 +455,16 @@ const IndividualBlogPage = () => {
           <div className="col-span-12 xl:col-span-8 p-8 lg:p-12 xl:p-16">
             <article className="max-w-4xl mx-auto prose prose-lg">
               {/* Article Content */}
-              <div className="space-y-6">
-                <p className="text-base font-montserrat leading-relaxed text-text-ui whitespace-pre-line">
+              <div className="space-y-6 overflow-hidden">
+                <div
+                  className="text-base font-montserrat leading-relaxed text-text-ui whitespace-pre-wrap break-words max-w-full"
+                  style={{
+                    overflowWrap: "break-word",
+                    wordBreak: "break-word",
+                  }}
+                >
                   {blog.content || blog.synopsis || "No content available."}
-                </p>
+                </div>
               </div>
             </article>
           </div>

@@ -7,8 +7,6 @@ import { getAllPoems } from "@/functions/services/main/poem";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://harumemoirs.xyz";
   const currentDate = new Date().toISOString();
-  
-
 
   // Static routes with SEO-optimized priorities and change frequencies
   const routes: MetadataRoute.Sitemap = [
@@ -61,31 +59,27 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       let hasMore = true;
       const limit = 100; // Batch size per request
 
-
-
       while (hasMore) {
         try {
           const res = await fetchFunction(page, limit);
           const data = res.data || res[type] || [];
-          const items = Array.isArray(data) ? data : (data.data || []); // Handle nested data structure
+          const items = Array.isArray(data) ? data : data.data || []; // Handle nested data structure
 
           if (items.length > 0) {
             allItems = [...allItems, ...items];
-            
+
             //Check pagination info if available
             const pagination = res.pagination || {};
-            hasMore = pagination.hasNextPage || (items.length === limit); 
-            
+            hasMore = pagination.hasNextPage || items.length === limit;
+
             if (hasMore) page++;
           } else {
             hasMore = false;
           }
         } catch (err) {
-
           hasMore = false; // Stop on error
         }
       }
-
 
       return allItems;
     };
@@ -99,14 +93,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ]);
 
     // Map helper
-    const mapToSitemap = (items: any[]) => items.map((item: any) => ({
-      url: `${baseUrl}/blogs/${item.slug}`,
-      lastModified: item.updatedAt || item.createdAt || item.date
-        ? new Date(item.updatedAt || item.createdAt || item.date).toISOString()
-        : currentDate,
-      changeFrequency: "weekly" as const,
-      priority: 0.7,
-    }));
+    const mapToSitemap = (items: any[]) =>
+      items.map((item: any) => ({
+        url: `${baseUrl}/blogs/${item.slug}`,
+        lastModified:
+          item.updatedAt || item.createdAt || item.date
+            ? new Date(
+                item.updatedAt || item.createdAt || item.date
+              ).toISOString()
+            : currentDate,
+        changeFrequency: "weekly" as const,
+        priority: 0.7,
+      }));
 
     const dynamicRoutes = [
       ...mapToSitemap(blogs),
@@ -115,11 +113,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       ...mapToSitemap(poems),
     ];
 
-
-
     return [...routes, ...dynamicRoutes];
   } catch (error) {
-
     return routes;
   }
 }
