@@ -1,5 +1,4 @@
 import http from "../../api/http";
- 
 
 export const getAllJournals = async (page = 1, limit = 9) => {
   try {
@@ -13,24 +12,23 @@ export const getAllJournals = async (page = 1, limit = 9) => {
     throw new Error(error?.response?.data?.message || "Failed to get journals");
   }
 };
- 
 
 export const getJournalBySlug = async (slug: string) => {
   try {
     const res = await http.get(`/api/v2/journal/by-slug/${slug}`);
-    return res.data;  
+    return res.data;
   } catch (error) {
     console.error("Error fetching journal ", error);
     throw error;
   }
 };
 
-export const getJournalById = async (id:string) => {
+export const getJournalById = async (id: string) => {
   try {
-    const res = await http.get(`/api/v2/journal/${id}`)
-    return res.data
+    const res = await http.get(`/api/v2/journal/${id}`);
+    return res.data;
   } catch (error) {
-    console.error('Error fetching journal',error)
-    throw error
+    console.error("Error fetching journal", error);
+    throw error;
   }
-}
+};

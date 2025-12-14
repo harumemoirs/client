@@ -16,7 +16,17 @@ const montserrat = Montserrat({
 });
 
 // Enhanced SEO metadata with Open Graph, Twitter Cards, and structured data
-export const metadata: Metadata = baseMetadata;
+export const metadata: Metadata = {
+  ...baseMetadata,
+  icons: {
+    icon: [
+      { url: "/favicon/favicon.ico", sizes: "any" },
+      { url: "/favicon/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon/favicon-96x96.png", sizes: "96x96", type: "image/png" },
+    ],
+    apple: "/apple-icon.png",
+  },
+};
 
 export default function RootLayout({
   children,
