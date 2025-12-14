@@ -1,14 +1,10 @@
-"use client";
-import React, { useState } from "react";
+import React from "react";
 import Image from "next/image";
 import Newsletter from "@/ui/newsletter";
 import PageTransition from "@/components/PageTransition";
-// import InstagramFeedMinimal from "@/custom/InstagramFeed";
-import NewsletterPopup, { useNewsletterPopup } from "@/custom/NewsLetterPopUp";
+import NewsletterPopupWrapper from "@/components/NewsletterPopupWrapper";
 
 const HomePage = () => {
-  const [hoveredCategory, setHoveredCategory] = useState<number | null>(null);
-  const { isOpen, closePopup } = useNewsletterPopup();
 
   const blogCategories = [
     {
@@ -57,7 +53,7 @@ const HomePage = () => {
     <PageTransition>
       <div className="min-h-screen bg-background text-text-ui">
         {/* Newsletter Popup */}
-        <NewsletterPopup isOpen={isOpen} onClose={closePopup} />
+        <NewsletterPopupWrapper />
 
         {/* Hero Section */}
         <section className="grid grid-cols-12 min-h-screen">
@@ -145,8 +141,6 @@ const HomePage = () => {
                 <article
                   key={category.id}
                   className="group border border-primary-light/30 hover:border-primary-dark/50 transition-all duration-300"
-                  onMouseEnter={() => setHoveredCategory(category.id)}
-                  onMouseLeave={() => setHoveredCategory(null)}
                 >
                   <div className="aspect-[4/3] md:aspect-[3/2] lg:aspect-[4/3] overflow-hidden relative">
                     <Image

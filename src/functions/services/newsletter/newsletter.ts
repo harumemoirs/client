@@ -21,20 +21,26 @@ export const subscribe = async (email: string) => {
         };
       }
       
+      // Handle "already subscribed" case - check both error and message fields
+      const errorText = (data.message || data.error || '').toLowerCase();
+      if (errorText.includes('already subscribed') || errorText.includes('already registered')) {
+        throw {
+          message: data.message || data.error,
+          isAlreadySubscribed: true,
+        };
+      }
+      
       // Handle other errors
       throw new Error(data.message || data.error || "Failed to subscribe");
     }
 
     return data;
   } catch (error: any) {
-    console.error("Error subscribing:", error);
-    
-    // Re-throw if it's already our structured error
-    if (error.isRateLimited) {
+    // Re-throw if it's already our structured error (rate-limited or already subscribed)
+    if (error.isRateLimited || error.isAlreadySubscribed) {
       throw error;
     }
     
     throw new Error(error.message || "Failed to subscribe");
   }
 };
-

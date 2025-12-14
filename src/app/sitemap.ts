@@ -7,6 +7,8 @@ import { getAllPoems } from "@/functions/services/main/poem";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://harumemoirs.xyz";
   const currentDate = new Date().toISOString();
+  
+
 
   // Static routes with SEO-optimized priorities and change frequencies
   const routes: MetadataRoute.Sitemap = [
@@ -49,51 +51,75 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   try {
-    // Fetch all content concurrently with a high limit to get everything
-    // Note: Google supports up to 50,000 URLs per sitemap, so 1000 is safe for now
-    const [blogsRes, journalsRes, lettersRes, poemsRes] =
-      await Promise.allSettled([
-        getAllBlogs(1, 1000),
-        getAllJournals(1, 1000),
-        getAllLetters(1, 1000),
-        getAllPoems(1, 1000),
-      ]);
+    // Helper to fetch ALL items across pages for a specific service
+    const fetchAllItems = async (
+      fetchFunction: (page: number, limit: number) => Promise<any>,
+      type: string
+    ) => {
+      let allItems: any[] = [];
+      let page = 1;
+      let hasMore = true;
+      const limit = 100; // Batch size per request
 
-    // Helper to process response and Map to sitemap format
-    const processItems = (result: PromiseSettledResult<any>, type: string) => {
-      if (result.status !== "fulfilled") return [];
 
-      // Handle different response structures (pagination wrapper vs direct array)
-      const data = result.value;
-      // Access the array based on the type key (blogs, journals, etc.) or generic 'data'
-      const items = data[type] || data.data || [];
 
-      if (!Array.isArray(items)) return [];
+      while (hasMore) {
+        try {
+          const res = await fetchFunction(page, limit);
+          const data = res.data || res[type] || [];
+          const items = Array.isArray(data) ? data : (data.data || []); // Handle nested data structure
 
-      return items.map((item: any) => ({
-        url: `${baseUrl}/blogs/${item.slug}`, // Using slug for SEO-friendly URLs
-        lastModified: item.date
-          ? new Date(item.date).toISOString()
-          : currentDate,
-        changeFrequency: "weekly" as const,
-        priority: 0.7,
-      }));
+          if (items.length > 0) {
+            allItems = [...allItems, ...items];
+            
+            //Check pagination info if available
+            const pagination = res.pagination || {};
+            hasMore = pagination.hasNextPage || (items.length === limit); 
+            
+            if (hasMore) page++;
+          } else {
+            hasMore = false;
+          }
+        } catch (err) {
+
+          hasMore = false; // Stop on error
+        }
+      }
+
+
+      return allItems;
     };
 
+    // Fetch all content types in parallel using the robust fetcher
+    const [blogs, journals, letters, poems] = await Promise.all([
+      fetchAllItems(getAllBlogs, "blogs"),
+      fetchAllItems(getAllJournals, "journals"),
+      fetchAllItems(getAllLetters, "letters"),
+      fetchAllItems(getAllPoems, "poems"),
+    ]);
+
+    // Map helper
+    const mapToSitemap = (items: any[]) => items.map((item: any) => ({
+      url: `${baseUrl}/blogs/${item.slug}`,
+      lastModified: item.updatedAt || item.createdAt || item.date
+        ? new Date(item.updatedAt || item.createdAt || item.date).toISOString()
+        : currentDate,
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    }));
+
     const dynamicRoutes = [
-      ...processItems(blogsRes, "blogs"),
-      ...processItems(journalsRes, "journals"),
-      ...processItems(lettersRes, "letters"),
-      ...processItems(poemsRes, "poems"),
+      ...mapToSitemap(blogs),
+      ...mapToSitemap(journals),
+      ...mapToSitemap(letters),
+      ...mapToSitemap(poems),
     ];
 
-    console.log(
-      `✅ Generated sitemap with ${routes.length} static and ${dynamicRoutes.length} dynamic routes`
-    );
+
 
     return [...routes, ...dynamicRoutes];
   } catch (error) {
-    console.error("Error generating sitemap:", error);
+
     return routes;
   }
 }

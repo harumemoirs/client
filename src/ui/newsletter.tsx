@@ -253,7 +253,6 @@ const Newsletter = () => {
         }, 1000);
       }, 50);
     } catch (error: any) {
-      console.error("Newsletter subscription error:", error);
       
       // Check if it's a rate limit error
       if (error.isRateLimited) {
@@ -284,6 +283,18 @@ const Newsletter = () => {
           setTimeout(() => {
             setIsVisible(true);
           }, 100);
+        }, 50);
+      } else if (error.isAlreadySubscribed) {
+        // Handle "already subscribed" gracefully without console error
+        setSubscribeStatus("already-subscribed");
+        setIsVisible(false);
+        
+        setTimeout(() => {
+          setIsVisible(true);
+          setTimeout(() => {
+            setIsVisible(false);
+            setTimeout(() => setSubscribeStatus(null), 1000);
+          }, 1000);
         }, 50);
       } else if (error.message && error.message.includes("Failed to subscribe")) {
         setSubscribeStatus("server-error");
@@ -452,6 +463,13 @@ const Newsletter = () => {
                           To prevent spam, please wait {Math.floor(remainingCooldown / 60)}:
                           {String(remainingCooldown % 60).padStart(2, "0")} before
                           subscribing again.
+                        </>
+                      ) : subscribeStatus === "already-subscribed" ? (
+                        <>
+                          <span className="font-medium uppercase tracking-wider block mb-2">
+                            ALREADY SUBSCRIBED
+                          </span>
+                          You're already part of our community! Check your inbox for our monthly letters.
                         </>
                       ) : subscribeStatus === "server-error" ? (
                         <>
