@@ -222,6 +222,44 @@ export const organizationSchema = {
   ],
 };
 
+// Site Navigation Schema for Sitelinks
+export const siteNavigationSchema = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: "Site Navigation",
+  description: "Main navigation links for Haru Memoirs",
+  itemListElement: [
+    {
+      "@type": "SiteNavigationElement",
+      position: 1,
+      name: "Home",
+      description: "Haru Memoirs homepage - Seasonal writing and gentle reflections",
+      url: SITE_URL,
+    },
+    {
+      "@type": "SiteNavigationElement",
+      position: 2,
+      name: "All Stories",
+      description: "Browse all blogs, journals, letters, and poems",
+      url: `${SITE_URL}/blogs`,
+    },
+    {
+      "@type": "SiteNavigationElement",
+      position: 3,
+      name: "About Christina",
+      description: "Learn more about Christina and Haru Memoirs",
+      url: `${SITE_URL}/about`,
+    },
+    {
+      "@type": "SiteNavigationElement",
+      position: 4,
+      name: "Contact",
+      description: "Get in touch with Christina",
+      url: `${SITE_URL}/contact-us`,
+    },
+  ],
+};
+
 // Blog Posting Schema Generator
 export function generateBlogPostingSchema({
   title,

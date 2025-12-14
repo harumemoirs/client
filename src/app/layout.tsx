@@ -3,7 +3,7 @@ import { EB_Garamond, Montserrat } from "next/font/google";
 import Footer from "@/ui/footer";
 import Navbar from "@/ui/navbar";
 import "./globals.css";
-import { baseMetadata, websiteSchema, organizationSchema } from "@/seo/metadata";
+import { baseMetadata, websiteSchema, organizationSchema, siteNavigationSchema } from "@/seo/metadata";
 
 const ebGaramond = EB_Garamond({
   subsets: ["latin"],
@@ -47,6 +47,12 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(organizationSchema),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(siteNavigationSchema),
           }}
         />
       </head>
