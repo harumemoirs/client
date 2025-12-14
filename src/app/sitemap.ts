@@ -53,7 +53,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   try {
-    // Helper to fetch ALL items across pages for a specific service
+    // Helper to fetch ALL items across pages for a specific service with timeout
     const fetchAllItems = async (
       fetchFunction: (page: number, limit: number) => Promise<any>,
       type: string
@@ -65,7 +65,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
       while (hasMore) {
         try {
-          const res = await fetchFunction(page, limit);
+          // Add timeout to prevent hanging (5 seconds per request)
+          const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error("Request timeout")), 5000)
+          );
+          
+          const res = await Promise.race([
+            fetchFunction(page, limit),
+            timeoutPromise,
+          ]);
+          
           const data = res.data || res[type] || [];
           const items = Array.isArray(data) ? data : data.data || []; // Handle nested data structure
 
@@ -81,6 +90,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             hasMore = false;
           }
         } catch (err) {
+          console.error(`Error fetching ${type} page ${page}:`, err);
           hasMore = false; // Stop on error
         }
       }
