@@ -505,11 +505,13 @@ const Newsletter = () => {
         <div className="col-span-12 xl:col-span-4 bg-primary-light/10 relative overflow-hidden">
           <div className="h-full min-h-[400px] xl:min-h-full relative">
             <Image
-              src="https://res.cloudinary.com/dwtbvdlzg/image/upload/v1764268054/newsletter_m5xiwj.jpg"
+              src="https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_800/v1764268054/newsletter_m5xiwj.jpg"
               alt="Letter writing and correspondence"
               fill
               className="object-cover opacity-80"
               sizes="(max-width: 1024px) 100vw, 33vw"
+              quality={85}
+              loading="lazy"
             />
             <div className="absolute inset-0 bg-[#5b4c3a]/20"></div>
 

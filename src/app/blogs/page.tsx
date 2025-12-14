@@ -297,15 +297,15 @@ const BlogsPage = () => {
 
   // Hero images for each category
   const heroImages: Record<string, string> = {
-    ALL: "https://res.cloudinary.com/dwtbvdlzg/image/upload/w_1200,h_800,c_fill/v1765380884/hero-1st-left_bc863k.jpg",
+    ALL: "https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_1200,h_800,c_fill/v1765380884/hero-1st-left_bc863k.jpg",
     LETTERS:
-      "https://res.cloudinary.com/dwtbvdlzg/image/upload/w_1200,h_800,c_fill/v1765552632/lavdi_n3eyiq.jpg",
+      "https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_1200,h_800,c_fill/v1765552632/lavdi_n3eyiq.jpg",
     POETRY:
-      "https://res.cloudinary.com/dwtbvdlzg/image/upload/w_1200,h_800,c_fill/v1765538787/1st-tides-of-change-2ndoption_uigzqo.jpg",
+      "https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_1200,h_800,c_fill/v1765538787/1st-tides-of-change-2ndoption_uigzqo.jpg",
     SELF_REFLECTION:
-      "https://res.cloudinary.com/dwtbvdlzg/image/upload/w_1200,h_800,c_fill/v1765539681/bc_ibghcv.jpg",
+      "https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_1200,h_800,c_fill/v1765539681/bc_ibghcv.jpg",
     JOURNALS:
-      "https://res.cloudinary.com/dwtbvdlzg/image/upload/w_1200,h_800,c_fill/v1765539067/journal-hero_xs6ysv.jpg",
+      "https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_1200,h_800,c_fill/v1765539067/journal-hero_xs6ysv.jpg",
   };
 
   const filteredBlogs =
@@ -500,12 +500,14 @@ const BlogsPage = () => {
                       src={
                         blog.imageUrls?.[0] ||
                         blog.image ||
-                        "https://res.cloudinary.com/dwtbvdlzg/image/upload/v1765380884/hero-1st-left_bc863k.jpg"
+                        "https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_800/v1765380884/hero-1st-left_bc863k.jpg"
                       }
                       alt={blog.title || "Untitled"}
                       fill
                       className="object-cover transition-transform duration-700 group-hover:scale-105"
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      quality={85}
+                      loading="lazy"
                     />
                   </div>
 
@@ -623,11 +625,13 @@ const BlogsPage = () => {
       <div className="grid grid-cols-12 border-t border-primary-light/30 gap-1">
         <div className="col-span-12 xl:col-span-6 bg-primary-dark text-white overflow-hidden relative min-h-[384px] xl:min-h-full">
           <Image
-            src="https://res.cloudinary.com/dwtbvdlzg/image/upload/v1764268082/contact-us-left-one_i9tatw.jpg"
+            src="https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_1000/v1764268082/contact-us-left-one_i9tatw.jpg"
             alt="Writing inspiration"
             fill
             className="object-cover opacity-70"
             sizes="(max-width: 1024px) 100vw, 50vw"
+            quality={80}
+            loading="lazy"
           />
           <div className="absolute inset-0 bg-[#5b4c3a]/40 flex items-center justify-center p-8 lg:p-12">
             <div className="text-center">
@@ -650,11 +654,13 @@ const BlogsPage = () => {
 
         <div className="col-span-12 xl:col-span-6 overflow-hidden relative min-h-[384px] xl:min-h-full">
           <Image
-            src="https://res.cloudinary.com/dwtbvdlzg/image/upload/v1764268082/contact-us-right-one_vnmcpw.jpg"
+            src="https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_1000/v1764268082/contact-us-right-one_vnmcpw.jpg"
             alt="Coastal heritage"
             fill
             className="object-cover"
             sizes="(max-width: 1024px) 100vw, 50vw"
+            quality={80}
+            loading="lazy"
           />
         </div>
       </div>

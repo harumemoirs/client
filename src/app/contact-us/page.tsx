@@ -519,12 +519,13 @@ const ContactUsPage = () => {
         <div className="col-span-12 xl:col-span-7 relative overflow-hidden min-h-[500px] xl:min-h-full">
           <div className="absolute inset-0 bg-primary-dark/20 z-10"></div>
           <Image
-            src="https://res.cloudinary.com/dwtbvdlzg/image/upload/v1765482920/contact-us-3rd-option_ahjgvu.jpg"
+            src="https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_1200/v1765482920/contact-us-3rd-option_ahjgvu.jpg"
             alt="Writing and correspondence"
             fill
             className="object-cover"
             sizes="(max-width: 1024px) 100vw, 60vw"
             priority
+            quality={90}
           />
           <div className="absolute bottom-8 left-8 text-white z-20">
             <p className="text-xs font-montserrat uppercase tracking-wider opacity-90">
@@ -724,12 +725,13 @@ const ContactUsPage = () => {
       <div className="grid grid-cols-12 border-t gap-1 border-primary-light/30">
         <div className="col-span-12 md:col-span-6 bg-primary-dark text-white overflow-hidden relative min-h-[400px] lg:min-h-[500px]">
           <Image
-            src="https://res.cloudinary.com/dwtbvdlzg/image/upload/v1764268024/from-the-coast-left_lvfbfq.jpg"
+            src="https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_1000/v1764268024/from-the-coast-left_lvfbfq.jpg"
             alt="Coastal writing inspiration"
             fill
             className="object-cover opacity-70"
             sizes="(max-width: 768px) 100vw, 50vw"
-            priority
+            quality={80}
+            loading="lazy"
           />
           <div className="absolute inset-0 bg-primary-dark/40 flex items-center justify-center p-8 lg:p-12 z-10">
             <div className="text-center">
@@ -745,11 +747,13 @@ const ContactUsPage = () => {
 
         <div className="col-span-12 md:col-span-6 overflow-hidden relative min-h-[400px] lg:min-h-[500px]">
           <Image
-            src="https://res.cloudinary.com/dwtbvdlzg/image/upload/w_800,h_600,c_fill/v1764268024/from-the-coast-right_f9k1gy.jpg"
+            src="https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_800,h_600,c_fill/v1764268024/from-the-coast-right_f9k1gy.jpg"
             alt="Cherry blossoms"
             fill
             className="object-cover"
             sizes="(max-width: 768px) 100vw, 50vw"
+            quality={80}
+            loading="lazy"
           />
         </div>
       </div>

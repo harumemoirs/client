@@ -389,11 +389,12 @@ const IndividualBlogPage = () => {
               <div className="border-t border-primary-light/30 pt-8">
                 <div className="flex items-center gap-4 mb-4">
                   <Image
-                    src="https://res.cloudinary.com/dwtbvdlzg/image/upload/w_800,h_600,c_fill/v1764664442/author_chro9a.jpg"
+                    src="https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_128,h_128,c_fill/v1764664442/author_chro9a.jpg"
                     alt="Christy"
                     width={64}
                     height={64}
                     className="rounded-full object-cover w-16 h-16"
+                    quality={85}
                   />
                   <div>
                     <h4 className="font-montserrat font-medium text-sm uppercase tracking-wider">
@@ -418,7 +419,7 @@ const IndividualBlogPage = () => {
               src={
                 blog.imageUrls?.[0] ||
                 blog.image ||
-                "https://res.cloudinary.com/dwtbvdlzg/image/upload/v1765380884/hero-1st-left_bc863k.jpg"
+                "https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_1600/v1765380884/hero-1st-left_bc863k.jpg"
               }
               alt={blog.title || "Untitled"}
               fill
@@ -537,11 +538,12 @@ const IndividualBlogPage = () => {
       <div className="grid grid-cols-12 border-t gap-1 border-primary-light/30">
         <div className="col-span-12 xl:col-span-6 bg-primary-dark text-white overflow-hidden relative">
           <Image
-            src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&h=600&fit=crop"
+            src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&h=600&fit=crop&auto=format&q=80"
             alt="Share your story"
             fill
             className="object-cover opacity-70"
-            quality={80}
+            quality={75}
+            loading="lazy"
           />
           <div className="absolute inset-0 bg-primary-dark/40 flex items-center justify-center p-8 lg:p-12 xl:p-12">
             <div className="text-center">
@@ -564,11 +566,12 @@ const IndividualBlogPage = () => {
 
         <div className="col-span-12 xl:col-span-6 overflow-hidden relative min-h-[384px] xl:min-h-full">
           <Image
-            src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop"
+            src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop&auto=format&q=80"
             alt="Heritage"
             fill
             className="object-cover"
-            quality={80}
+            quality={75}
+            loading="lazy"
           />
         </div>
       </div>

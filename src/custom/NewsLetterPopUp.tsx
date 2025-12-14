@@ -336,6 +336,7 @@
 // new code with improved validation and error handling
 "use client";
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { subscribe } from "@/functions/services/newsletter/newsletter";
 
 interface NewsletterPopupProps {
@@ -565,13 +566,16 @@ const NewsletterPopup: React.FC<NewsletterPopupProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-2">
           {/* Left Side - Image with parallax effect */}
           <div className="relative overflow-hidden h-64 lg:h-auto">
-            <div className="absolute inset-0 bg-primary-dark/20"></div>
-            <img
-              src="https://res.cloudinary.com/dwtbvdlzg/image/upload/v1764268054/newsletter_m5xiwj.jpg"
+            <div className="absolute inset-0 bg-primary-dark/20 z-10"></div>
+            <Image
+              src="https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_800/v1764268054/newsletter_m5xiwj.jpg"
               alt="Coastal writing inspiration"
-              className={`w-full h-full object-cover transition-transform duration-700 ease-out ${
+              fill
+              className={`object-cover transition-transform duration-700 ease-out ${
                 isVisible ? "scale-100" : "scale-110"
               }`}
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              quality={85}
             />
             <div
               className={`absolute bottom-4 left-4 text-white transition-all duration-500 delay-150 ease-out ${
