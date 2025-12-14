@@ -4,9 +4,9 @@ import { getAllJournals } from "@/functions/services/main/journal";
 import { getAllLetters } from "@/functions/services/main/letter";
 import { getAllPoems } from "@/functions/services/main/poem";
 
-// Enable ISR: Cache sitemap and revalidate every 24 hours (86400 seconds)
+// Enable ISR: Cache sitemap and revalidate every 1 hour (3600 seconds)
 // This prevents timeout issues with Google Search Console
-export const revalidate = 86400; // 24 hours
+export const revalidate = 3600; // 1 hour
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://harumemoirs.xyz";
@@ -53,82 +53,96 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   try {
-    // Helper to fetch ALL items across pages for a specific service with timeout
-    const fetchAllItems = async (
-      fetchFunction: (page: number, limit: number) => Promise<any>,
-      type: string
-    ) => {
-      let allItems: any[] = [];
-      let page = 1;
-      let hasMore = true;
-      const limit = 100; // Batch size per request
+    // Global timeout for entire sitemap generation (10 seconds)
+    const timeoutPromise = new Promise<MetadataRoute.Sitemap>((resolve) =>
+      setTimeout(() => {
+        console.warn("Sitemap generation timed out, returning static routes only");
+        resolve(routes);
+      }, 10000)
+    );
 
-      while (hasMore) {
-        try {
-          // Add timeout to prevent hanging (5 seconds per request)
-          const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error("Request timeout")), 5000)
-          );
-          
-          const res = await Promise.race([
-            fetchFunction(page, limit),
-            timeoutPromise,
-          ]);
-          
-          const data = res.data || res[type] || [];
-          const items = Array.isArray(data) ? data : data.data || []; // Handle nested data structure
+    const generateDynamicSitemap = async (): Promise<MetadataRoute.Sitemap> => {
+      // Helper to fetch ALL items across pages for a specific service with timeout
+      const fetchAllItems = async (
+        fetchFunction: (page: number, limit: number) => Promise<any>,
+        type: string
+      ) => {
+        let allItems: any[] = [];
+        let page = 1;
+        let hasMore = true;
+        const limit = 100; // Batch size per request
 
-          if (items.length > 0) {
-            allItems = [...allItems, ...items];
+        while (hasMore) {
+          try {
+            // Add timeout to prevent hanging (5 seconds per request)
+            const timeoutPromise = new Promise((_, reject) =>
+              setTimeout(() => reject(new Error("Request timeout")), 5000)
+            );
+            
+            const res = await Promise.race([
+              fetchFunction(page, limit),
+              timeoutPromise,
+            ]);
+            
+            const data = res.data || res[type] || [];
+            const items = Array.isArray(data) ? data : data.data || []; // Handle nested data structure
 
-            //Check pagination info if available
-            const pagination = res.pagination || {};
-            hasMore = pagination.hasNextPage || items.length === limit;
+            if (items.length > 0) {
+              allItems = [...allItems, ...items];
 
-            if (hasMore) page++;
-          } else {
-            hasMore = false;
+              //Check pagination info if available
+              const pagination = res.pagination || {};
+              hasMore = pagination.hasNextPage || items.length === limit;
+
+              if (hasMore) page++;
+            } else {
+              hasMore = false;
+            }
+          } catch (err) {
+            console.error(`Error fetching ${type} page ${page}:`, err);
+            hasMore = false; // Stop on error
           }
-        } catch (err) {
-          console.error(`Error fetching ${type} page ${page}:`, err);
-          hasMore = false; // Stop on error
         }
-      }
 
-      return allItems;
+        return allItems;
+      };
+
+      // Fetch all content types in parallel using the robust fetcher
+      const [blogs, journals, letters, poems] = await Promise.all([
+        fetchAllItems(getAllBlogs, "blogs"),
+        fetchAllItems(getAllJournals, "journals"),
+        fetchAllItems(getAllLetters, "letters"),
+        fetchAllItems(getAllPoems, "poems"),
+      ]);
+
+      // Map helper
+      const mapToSitemap = (items: any[]) =>
+        items.map((item: any) => ({
+          url: `${baseUrl}/blogs/${item.slug}`,
+          lastModified:
+            item.updatedAt || item.createdAt || item.date
+              ? new Date(
+                  item.updatedAt || item.createdAt || item.date
+                ).toISOString()
+              : currentDate,
+          changeFrequency: "weekly" as const,
+          priority: 0.7,
+        }));
+
+      const dynamicRoutes = [
+        ...mapToSitemap(blogs),
+        ...mapToSitemap(journals),
+        ...mapToSitemap(letters),
+        ...mapToSitemap(poems),
+      ];
+
+      return [...routes, ...dynamicRoutes];
     };
 
-    // Fetch all content types in parallel using the robust fetcher
-    const [blogs, journals, letters, poems] = await Promise.all([
-      fetchAllItems(getAllBlogs, "blogs"),
-      fetchAllItems(getAllJournals, "journals"),
-      fetchAllItems(getAllLetters, "letters"),
-      fetchAllItems(getAllPoems, "poems"),
-    ]);
-
-    // Map helper
-    const mapToSitemap = (items: any[]) =>
-      items.map((item: any) => ({
-        url: `${baseUrl}/blogs/${item.slug}`,
-        lastModified:
-          item.updatedAt || item.createdAt || item.date
-            ? new Date(
-                item.updatedAt || item.createdAt || item.date
-              ).toISOString()
-            : currentDate,
-        changeFrequency: "weekly" as const,
-        priority: 0.7,
-      }));
-
-    const dynamicRoutes = [
-      ...mapToSitemap(blogs),
-      ...mapToSitemap(journals),
-      ...mapToSitemap(letters),
-      ...mapToSitemap(poems),
-    ];
-
-    return [...routes, ...dynamicRoutes];
+    // Race between timeout and actual generation
+    return await Promise.race([timeoutPromise, generateDynamicSitemap()]);
   } catch (error) {
+    console.error("Error generating sitemap:", error);
     return routes;
   }
 }
