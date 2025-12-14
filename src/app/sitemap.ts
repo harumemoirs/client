@@ -4,6 +4,10 @@ import { getAllJournals } from "@/functions/services/main/journal";
 import { getAllLetters } from "@/functions/services/main/letter";
 import { getAllPoems } from "@/functions/services/main/poem";
 
+// Enable ISR: Cache sitemap and revalidate every 24 hours (86400 seconds)
+// This prevents timeout issues with Google Search Console
+export const revalidate = 86400; // 24 hours
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://harumemoirs.xyz";
   const currentDate = new Date().toISOString();
