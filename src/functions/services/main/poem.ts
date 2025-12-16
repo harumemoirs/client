@@ -13,22 +13,24 @@ export const getAllPoems = async (page = 1, limit = 9) => {
   }
 };
 
-export const getPoemBySlug = async (slug: string) => {
+export const getPoemById = async (id: string) => {
   try {
-    const res = await http.get(`/api/v2/poem/by-slug/${slug}`);
+    const res = await http.get(`/api/v2/poem/poem-id/${id}`);
     return res.data;
   } catch (error) {
-    console.error("Error fetching poem ", error);
+    console.error("Error fetching poem", error);
     throw error;
   }
 };
 
-export const getPoemById = async (id: string) => {
+export const getPoemBySlug = async (slug: string) => {
   try {
-    const res = await http.get(`/api/v2/poem/${id}`);
+    const res = await http.get(`/api/v2/poem/poem--slug/${slug}`);
     return res.data;
-  } catch (error) {
-    console.error("Error fetching poem", error);
+  } catch (error: any) {
+    if (error?.response?.status !== 404) {
+      console.error("Error fetching poem by slug", error);
+    }
     throw error;
   }
 };

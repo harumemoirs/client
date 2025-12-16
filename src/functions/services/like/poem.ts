@@ -25,9 +25,9 @@ export const checkPoemLike = async (blogId:string,fingerprint:string) => {
     }
 }
 
-export const getPoemLikes = async (slug:string ) => {
+export const getPoemLikes = async (id:string ) => {
     try {
-        const res = await http.get(`/api/v2/poems/user-like/likes/${slug}`,{
+        const res = await http.get(`/api/v2/poems/user-like/likes/${id}`,{
     
         })
         return res.data;

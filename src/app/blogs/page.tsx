@@ -1,35 +1,215 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import Newsletter from "@/ui/newsletter";
+import dynamic from "next/dynamic";
+
+// Lazy load Newsletter as it is below the fold
+const Newsletter = dynamic(() => import("@/ui/newsletter"), {
+  loading: () => <div className="min-h-[400px] bg-background animate-pulse" />,
+});
 import Link from "next/link";
 import { getOrCreateBrowserId } from "@/lib/browserId";
+import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import { getAllBlogs } from "@/functions/services/main/blogs";
 import { getAllJournals } from "@/functions/services/main/journal";
 import { getAllLetters } from "@/functions/services/main/letter";
 import { getAllPoems } from "@/functions/services/main/poem";
-// Imports removed as toggle functionality is no longer needed on this page
+import { getTotalCount } from "@/functions/services/count/count";
 
 const BlogsPage = () => {
   const [selectedCategory, setSelectedCategory] = useState("ALL");
   const [likedBlogs, setLikedBlogs] = useState<Set<number>>(new Set());
-
-  // API states
-  const [blogs, setBlogs] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [hasMore, setHasMore] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
-  // Category counts from API
-  const [categoryCounts, setCategoryCounts] = useState({
-    ALL: 0,
-    LETTERS: 0,
-    POETRY: 0,
-    SELF_REFLECTION: 0,
-    JOURNALS: 0,
+  // --- Data Fetching Functions ---
+
+  const fetchCounts = async () => {
+    const result = await getTotalCount();
+    const countsData = result.data || result;
+    return {
+      SELF_REFLECTION: parseInt(
+        countsData.SELF_REFLECTION || countsData.blogs || "0"
+      ),
+      JOURNALS: parseInt(countsData.JOURNALS || countsData.journals || "0"),
+      LETTERS: parseInt(countsData.LETTERS || countsData.letters || "0"),
+      POETRY: parseInt(countsData.POETRY || countsData.poems || "0"),
+      ALL: 0,
+    };
+  };
+
+  const fetchAllTypes = async ({ pageParam = 1 }) => {
+    const [blogsRes, journalsRes, lettersRes, poemsRes] =
+      await Promise.allSettled([
+        getAllBlogs(pageParam, 9),
+        getAllJournals(pageParam, 9),
+        getAllLetters(pageParam, 9),
+        getAllPoems(pageParam, 9),
+      ]);
+
+    const processRes = (res: any, category: string, type: string) => {
+      if (res.status === "fulfilled") {
+        return (
+          res.value[type === "blog" ? "blogs" : type + "s"] ||
+          res.value.data ||
+          []
+        ).map((item: any) => ({
+          ...item,
+          category,
+          type,
+          sortDate: new Date(
+            item.createdAt || item.date || Date.now()
+          ).getTime(),
+        }));
+      }
+      return [];
+    };
+
+    const newBatch = [
+      ...processRes(blogsRes, "SELF_REFLECTION", "blog"),
+      ...processRes(journalsRes, "JOURNALS", "journal"),
+      ...processRes(lettersRes, "LETTERS", "letter"),
+      ...processRes(poemsRes, "POETRY", "poem"),
+    ];
+
+    return {
+      items: newBatch.sort((a, b) => b.sortDate - a.sortDate),
+      nextPage: newBatch.length > 0 ? pageParam + 1 : undefined,
+    };
+  };
+
+  const fetchSpecificCategory = async (category: string, page: number) => {
+    let response;
+    let type = "";
+    switch (category) {
+      case "SELF_REFLECTION":
+        response = await getAllBlogs(page, 9);
+        type = "blog";
+        break;
+      case "JOURNALS":
+        response = await getAllJournals(page, 9);
+        type = "journal";
+        break;
+      case "LETTERS":
+        response = await getAllLetters(page, 9);
+        type = "letter";
+        break;
+      case "POETRY":
+        response = await getAllPoems(page, 9);
+        type = "poem";
+        break;
+      default:
+        return { items: [], total: 0 };
+    }
+
+    const items = (
+      response[type === "blog" ? "blogs" : type + "s"] ||
+      response.data ||
+      []
+    ).map((item: any) => ({
+      ...item,
+      category,
+      type,
+    }));
+
+    const totalCount = parseInt(
+      response?.pagination?.total ||
+        response?.total ||
+        response?.totalCount ||
+        "0"
+    );
+
+    return { items, total: totalCount };
+  };
+
+  // --- React Query Hooks ---
+
+  // 1. Counts
+  const { data: countsData } = useQuery({
+    queryKey: ["categoryCounts"],
+    queryFn: fetchCounts,
+    staleTime: 5 * 60 * 1000, 
   });
+
+  const categoryCounts = React.useMemo(() => {
+    const counts = countsData || {
+      SELF_REFLECTION: 0,
+      JOURNALS: 0,
+      LETTERS: 0,
+      POETRY: 0,
+      ALL: 0,
+    };
+    counts.ALL =
+      counts.SELF_REFLECTION +
+      counts.JOURNALS +
+      counts.LETTERS +
+      counts.POETRY;
+    return counts;
+  }, [countsData]);
+
+  // 2. Infinite Query for "ALL"
+  const {
+    data: allStoriesData,
+    fetchNextPage,
+    hasNextPage,
+    isLoading: isLoadingAll,
+    isError: isErrorAll,
+    error: errorAll,
+  } = useInfiniteQuery({
+    queryKey: ["stories", "ALL"],
+    queryFn: fetchAllTypes,
+    getNextPageParam: (lastPage) => lastPage.nextPage,
+    initialPageParam: 1,
+    enabled: selectedCategory === "ALL",
+    staleTime: 60 * 1000,
+  });
+
+  // 3. Standard Query for Specific Categories
+  const {
+    data: specificStoriesData,
+    isLoading: isLoadingSpecific,
+    isError: isErrorSpecific,
+    error: errorSpecific,
+  } = useQuery({
+    queryKey: ["stories", selectedCategory, currentPage],
+    queryFn: () => fetchSpecificCategory(selectedCategory, currentPage),
+    enabled: selectedCategory !== "ALL",
+    placeholderData: (previousData: any) => previousData, // Keep previous data while fetching new page
+    staleTime: 60 * 1000,
+  });
+
+  // --- Derived State ---
+
+  const loading = selectedCategory === "ALL" ? isLoadingAll : isLoadingSpecific;
+  const error =
+    selectedCategory === "ALL"
+      ? (errorAll as Error)?.message
+      : (errorSpecific as Error)?.message;
+
+  const blogs = React.useMemo(() => {
+    if (selectedCategory === "ALL") {
+      if (!allStoriesData) return [];
+      // Flatten all pages
+      const allItems = allStoriesData.pages.flatMap((page) => page.items);
+      const startIndex = (currentPage - 1) * 9;
+      const endIndex = startIndex + 9;
+      return allItems.slice(startIndex, endIndex);
+    } else {
+      return specificStoriesData?.items || [];
+    }
+  }, [selectedCategory, allStoriesData, specificStoriesData, currentPage]);
+
+  // Handle "Fetch More" for ALL category
+  useEffect(() => {
+    if (selectedCategory === "ALL" && allStoriesData) {
+        const totalFetched = allStoriesData.pages.flatMap(p => p.items).length;
+        const required = currentPage * 9;
+        if (totalFetched < required && hasNextPage) {
+            fetchNextPage();
+        }
+    }
+  }, [selectedCategory, currentPage, allStoriesData, hasNextPage, fetchNextPage]);
+
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -44,243 +224,14 @@ const BlogsPage = () => {
       setCurrentPage(parseInt(pageParam));
     }
 
-    // Initialize browser ID on mount
     getOrCreateBrowserId();
   }, []);
 
-  // Fetch blogs when component mounts or category/page changes
-  useEffect(() => {
-    fetchBlogs(currentPage);
-  }, [selectedCategory, currentPage]);
-
-  // Buffer for "ALL" category to handle mixed pagination
-  const [allStoriesBuffer, setAllStoriesBuffer] = useState<any[]>([]);
-  const maxBackendPageFetched = React.useRef(0);
-  const [hasMoreBackendData, setHasMoreBackendData] = useState(true);
-
-  const fetchBlogs = async (page: number) => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      // Reset buffer if pulling page 1 and we don't have it (or simple reset logic could be applied on cat change)
-      // Actually, category change is cleaned up in effect dependency
-
-      let allResults: any[] = [];
-      let totalCount = 0;
-      let maxCategoryTotal = 0;
-
-      if (selectedCategory === "ALL") {
-        setIsTransitioning(true);
-
-        // Calculate if we need more data in the buffer
-        const requiredItemCount = page * 9;
-
-        // Correct Loop Logic:
-        // We use a local variable for the buffer to handle synchronous updates during the fetch loop
-        let localBuffer = [...allStoriesBuffer];
-        let localBackendPage = maxBackendPageFetched.current;
-        let localHasMore = hasMoreBackendData;
-
-        // Reset tracking if page 1 and strictly reloading (optional safety, but buffer check handles most)
-        if (page === 1 && localBuffer.length === 0) {
-          localBackendPage = 0;
-          localHasMore = true;
-        }
-
-        while (localBuffer.length < requiredItemCount && localHasMore) {
-          const nextBackendPage = localBackendPage + 1;
-
-          // Fetch from all endpoints in parallel
-          const [blogsRes, journalsRes, lettersRes, poemsRes] =
-            await Promise.allSettled([
-              getAllBlogs(nextBackendPage, 9),
-              getAllJournals(nextBackendPage, 9),
-              getAllLetters(nextBackendPage, 9),
-              getAllPoems(nextBackendPage, 9),
-            ]);
-
-          let newBatch: any[] = [];
-          let batchHasData = false;
-
-          const processRes = (res: any, category: string, type: string) => {
-            if (res.status === "fulfilled") {
-              const items = (
-                res.value[type === "blog" ? "blogs" : type + "s"] ||
-                res.value.data ||
-                []
-              ).map((item: any) => ({
-                ...item,
-                category: category,
-                type: type,
-                sortDate: new Date(
-                  item.createdAt || item.date || Date.now()
-                ).getTime(),
-              }));
-              if (items.length > 0) batchHasData = true;
-              return items;
-            }
-            return [];
-          };
-
-          newBatch.push(...processRes(blogsRes, "SELF_REFLECTION", "blog"));
-          newBatch.push(...processRes(journalsRes, "JOURNALS", "journal"));
-          newBatch.push(...processRes(lettersRes, "LETTERS", "letter"));
-          newBatch.push(...processRes(poemsRes, "POETRY", "poem"));
-
-          if (!batchHasData) {
-            localHasMore = false;
-            break;
-          }
-
-          localBuffer = [...localBuffer, ...newBatch].sort(
-            (a, b) => b.sortDate - a.sortDate
-          );
-          localBackendPage = nextBackendPage;
-        }
-
-        // Commit updates
-        setAllStoriesBuffer(localBuffer);
-        maxBackendPageFetched.current = localBackendPage;
-        setHasMoreBackendData(localHasMore);
-
-        // Slice for display
-        const startIndex = (page - 1) * 9;
-        const endIndex = startIndex + 9;
-        const displayItems = localBuffer.slice(startIndex, endIndex);
-
-        setBlogs(displayItems);
-
-        // Update URL and HasMore
-        // Total count logic is approximate for "ALL" because we are buffering.
-        // We can use the counts fetched separately to determine total.
-        const totalEstimated = categoryCounts.ALL || 999;
-        setHasMore(localBuffer.length > endIndex || localHasMore);
-
-        // Wait for fade out animation if not initial
-        if (page > 1) {
-          await new Promise((resolve) => setTimeout(resolve, 300));
-        }
-      } else {
-        // Specific Category Logic (Unchanged but wrapped)
-        setIsTransitioning(true);
-        await new Promise((resolve) => setTimeout(resolve, 500));
-
-        let response;
-        switch (selectedCategory) {
-          case "SELF_REFLECTION":
-            response = await getAllBlogs(page, 9);
-            allResults = (response.blogs || response.data || []).map(
-              (item: any) => ({
-                ...item,
-                category: "SELF_REFLECTION",
-                type: "blog",
-              })
-            );
-            break;
-          case "JOURNALS":
-            response = await getAllJournals(page, 9);
-            allResults = (response.journals || response.data || []).map(
-              (item: any) => ({
-                ...item,
-                category: "JOURNALS",
-                type: "journal",
-              })
-            );
-            break;
-          case "LETTERS":
-            response = await getAllLetters(page, 9);
-            allResults = (response.letters || response.data || []).map(
-              (item: any) => ({ ...item, category: "LETTERS", type: "letter" })
-            );
-            break;
-          case "POETRY":
-            response = await getAllPoems(page, 9);
-            allResults = (response.poems || response.data || []).map(
-              (item: any) => ({ ...item, category: "POETRY", type: "poem" })
-            );
-            break;
-        }
-        totalCount = parseInt(
-          response?.pagination?.total ||
-            response?.total ||
-            response?.totalCount ||
-            "0"
-        );
-        setBlogs(allResults);
-        setHasMore(page * 9 < totalCount);
-      }
-
-      // Common URL updates
-      const params = new URLSearchParams(window.location.search);
-      if (page > 1) params.set("page", page.toString());
-      else params.delete("page");
-
-      if (selectedCategory !== "ALL") params.set("category", selectedCategory);
-      else params.delete("category");
-
-      const newUrl = params.toString()
-        ? `${window.location.pathname}?${params}`
-        : window.location.pathname;
-      window.history.pushState({}, "", newUrl);
-    } catch (err: any) {
-      console.error("Error fetching content:", err);
-      setError(err.message || "Failed to load content");
-    } finally {
-      setLoading(false);
-      setTimeout(() => setIsTransitioning(false), 50);
-    }
-  };
-
-  // Fetch category counts from all endpoints
-  const fetchCategoryCounts = async () => {
-    try {
-      const [blogsRes, journalsRes, lettersRes, poemsRes] =
-        await Promise.allSettled([
-          getAllBlogs(1, 1), // Fetch 1 item just to get total count
-          getAllJournals(1, 1),
-          getAllLetters(1, 1),
-          getAllPoems(1, 1),
-        ]);
-
-      // Extract counts from pagination.total (which is a string)
-      const counts = {
-        SELF_REFLECTION:
-          blogsRes.status === "fulfilled"
-            ? parseInt(blogsRes.value?.pagination?.total || "0")
-            : 0,
-        JOURNALS:
-          journalsRes.status === "fulfilled"
-            ? parseInt(journalsRes.value?.pagination?.total || "0")
-            : 0,
-        LETTERS:
-          lettersRes.status === "fulfilled"
-            ? parseInt(lettersRes.value?.pagination?.total || "0")
-            : 0,
-        POETRY:
-          poemsRes.status === "fulfilled"
-            ? parseInt(poemsRes.value?.pagination?.total || "0")
-            : 0,
-        ALL: 0, // Will calculate below
-      };
-
-      // ALL is sum of all categories
-      counts.ALL =
-        counts.SELF_REFLECTION +
-        counts.JOURNALS +
-        counts.LETTERS +
-        counts.POETRY;
-
-      setCategoryCounts(counts);
-    } catch (error) {
-      console.error("Error fetching category counts:", error);
-    }
-  };
-
-  // Fetch counts on mount
-  useEffect(() => {
-    fetchCategoryCounts();
-  }, []);
+  // Sync isTransitioning with loading state approx
+  // Or just rely on loading state.
+  // The original code used manual transition. 
+  // We can simplify by just using the loading state or keeping isTransitioning if desired.
+  // We'll keep it simple for now.
 
   // categories with dynamic counts
   const categories = [
@@ -308,15 +259,18 @@ const BlogsPage = () => {
       "https://res.cloudinary.com/dwtbvdlzg/image/upload/w_1200,h_800,c_fill/v1765539067/journal-hero_xs6ysv.jpg",
   };
 
-  const filteredBlogs =
+  const hasMore =
     selectedCategory === "ALL"
-      ? blogs
-      : blogs.filter((blog) => blog.category === selectedCategory);
+      ? (allStoriesData?.pages.flatMap((p) => p.items).length || 0) >
+          currentPage * 9 || hasNextPage
+      : currentPage * 9 < (specificStoriesData?.total || 0);
+
+  const filteredBlogs = blogs;
 
   const handleNextPage = () => {
     const nextPage = currentPage + 1;
     setCurrentPage(nextPage);
-    fetchBlogs(nextPage);
+    updateUrl(selectedCategory, nextPage);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -324,20 +278,29 @@ const BlogsPage = () => {
     if (currentPage > 1) {
       const prevPage = currentPage - 1;
       setCurrentPage(prevPage);
-      fetchBlogs(prevPage);
+      updateUrl(selectedCategory, prevPage);
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
+  };
+
+  const updateUrl = (category: string, page: number) => {
+    const params = new URLSearchParams(window.location.search);
+    if (page > 1) params.set("page", page.toString());
+    else params.delete("page");
+
+    if (category !== "ALL") params.set("category", category);
+    else params.delete("category");
+
+    const newUrl = params.toString()
+      ? `${window.location.pathname}?${params}`
+      : window.location.pathname;
+    window.history.pushState({}, "", newUrl);
   };
 
   const handleCategoryChange = (categoryId: string) => {
     setSelectedCategory(categoryId);
     setCurrentPage(1);
-
-    const newUrl =
-      categoryId === "ALL"
-        ? window.location.pathname
-        : `${window.location.pathname}?category=${categoryId}`;
-    window.history.pushState({}, "", newUrl);
+    updateUrl(categoryId, 1);
   };
 
   // Check for liked blogs in localStorage on mount and when blogs change
@@ -348,7 +311,7 @@ const BlogsPage = () => {
     const newLikedBlogs = new Set<number>();
 
     // Check all currently loaded blogs
-    blogs.forEach((blog) => {
+    blogs.forEach((blog: any) => {
       const likedKey = `hm_liked_${fingerprint}_${blog.id}`;
       if (localStorage.getItem(likedKey) === "true") {
         newLikedBlogs.add(blog.id);
@@ -539,7 +502,7 @@ const BlogsPage = () => {
                     </div>
 
                     <h3 className="text-xl md:text-2xl font-garamond font-light mb-4 group-hover:text-primary-dark transition-colors duration-300">
-                      <Link href={`/blogs/${blog.slug}`}>
+                      <Link href={`/blogs/${blog.slug}?type=${blog.type}`}>
                         {blog.title || "Untitled"}
                       </Link>
                     </h3>
@@ -560,7 +523,7 @@ const BlogsPage = () => {
                         </span>
                       </div>
                       <Link
-                        href={`/blogs/${blog.slug}`}
+                        href={`/blogs/${blog.slug}?type=${blog.type}`}
                         className="text-xs font-montserrat uppercase tracking-wider text-primary-dark/60 group-hover:text-primary-dark transition-colors duration-300"
                       >
                         READ MORE →
@@ -627,7 +590,7 @@ const BlogsPage = () => {
             alt="Writing inspiration"
             fill
             className="object-cover opacity-70"
-            sizes="(max-width: 1024px) 100vw, 50vw"
+            sizes="(max-width: 1280px) 100vw, 50vw"
           />
           <div className="absolute inset-0 bg-[#5b4c3a]/40 flex items-center justify-center p-8 lg:p-12">
             <div className="text-center">
@@ -654,7 +617,7 @@ const BlogsPage = () => {
             alt="Coastal heritage"
             fill
             className="object-cover"
-            sizes="(max-width: 1024px) 100vw, 50vw"
+            sizes="(max-width: 1280px) 100vw, 50vw"
           />
         </div>
       </div>

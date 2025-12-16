@@ -1,14 +1,21 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { useParams } from "next/navigation";
-import Newsletter from "@/ui/newsletter";
+import { useParams, useSearchParams } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
+import dynamic from "next/dynamic";
+
+// Lazy load Newsletter
+const Newsletter = dynamic(() => import("@/ui/newsletter"), {
+  loading: () => <div className="min-h-[400px] bg-background animate-pulse" />,
+});
 import Link from "next/link";
+import BlogSkeleton from "@/components/BlogSkeleton";
 import { getOrCreateBrowserId } from "@/lib/browserId";
-import { getAllBlogs } from "@/functions/services/main/blogs";
-import { getAllJournals } from "@/functions/services/main/journal";
-import { getAllLetters } from "@/functions/services/main/letter";
-import { getAllPoems } from "@/functions/services/main/poem";
+import { getBlogBySlug } from "@/functions/services/main/blogs";
+import { getJournalBySlug } from "@/functions/services/main/journal";
+import { getLetterBySlug } from "@/functions/services/main/letter";
+import { getPoemBySlug } from "@/functions/services/main/poem";
 import { toggleBlogLike, checkBlogLike } from "@/functions/services/like/blog";
 import {
   toggleJournalLike,
@@ -22,114 +29,136 @@ import { togglePoemLike, checkPoemLike } from "@/functions/services/like/poem";
 
 const IndividualBlogPage = () => {
   const params = useParams();
+  const searchParams = useSearchParams();
   const blogSlug = params?.slug as string;
+  const typeParam = searchParams.get('type');
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [loading, setLoading] = useState(false);
 
   // API states
-  const [blog, setBlog] = useState<any>(null);
-  const [blogLoading, setBlogLoading] = useState(true);
-  const [blogError, setBlogError] = useState<string | null>(null);
+  // API states
+  // const [blog, setBlog] = useState<any>(null); // Replaced by useQuery
+  // const [blogLoading, setBlogLoading] = useState(true); // Replaced by useQuery
+  // const [blogError, setBlogError] = useState<string | null>(null); // Replaced by useQuery
   const [relatedPosts, setRelatedPosts] = useState<any[]>([]);
 
-  // Fetch blog data - fetch all blogs and filter by slug
-  useEffect(() => {
-    const fetchBlog = async () => {
-      if (!blogSlug) return;
+  // --- React Query Fetch Function ---
+  const fetchStory = async () => {
+    if (!blogSlug) throw new Error("No slug provided");
 
+    let foundBlog = null;
+    let contentType = "";
+
+    // 1. Try Type Hint
+    if (typeParam) {
       try {
-        setBlogLoading(true);
-        setBlogError(null);
+        let singleRes;
+        let foundType = "";
 
-        // Fetch all blogs from all categories and find the one matching slug
-        const [blogsRes, journalsRes, lettersRes, poemsRes] =
-          await Promise.allSettled([
-            getAllBlogs(1, 100), // Fetch more to ensure we get the blog
-            getAllJournals(1, 100),
-            getAllLetters(1, 100),
-            getAllPoems(1, 100),
-          ]);
-
-        let foundBlog = null;
-        let contentType = "";
-
-        // Search in blogs (self-reflection)
-        if (blogsRes.status === "fulfilled") {
-          const blogs = blogsRes.value.blogs || blogsRes.value.data || [];
-          foundBlog = blogs.find((b: any) => b.slug === blogSlug);
-          if (foundBlog) {
-            contentType = "SELF_REFLECTION";
-          }
-        }
-
-        // Search in journals if not found
-        if (!foundBlog && journalsRes.status === "fulfilled") {
-          const journals =
-            journalsRes.value.journals || journalsRes.value.data || [];
-          foundBlog = journals.find((j: any) => j.slug === blogSlug);
-          if (foundBlog) {
-            contentType = "JOURNALS";
-          }
-        }
-
-        // Search in letters if not found
-        if (!foundBlog && lettersRes.status === "fulfilled") {
-          const letters =
-            lettersRes.value.letters || lettersRes.value.data || [];
-          foundBlog = letters.find((l: any) => l.slug === blogSlug);
-          if (foundBlog) {
-            contentType = "LETTERS";
-          }
-        }
-
-        // Search in poems if not found
-        if (!foundBlog && poemsRes.status === "fulfilled") {
-          const poems = poemsRes.value.poems || poemsRes.value.data || [];
-          foundBlog = poems.find((p: any) => p.slug === blogSlug);
-          if (foundBlog) {
-            contentType = "POETRY";
-          }
-        }
-
-        if (!foundBlog) {
-          throw new Error("Content not found");
-        }
-
-        // Set both category and type for proper API service selection
-        let type;
-        switch (contentType) {
-          case "SELF_REFLECTION":
-            type = "blog";
+        switch (typeParam) {
+          case "blog":
+            singleRes = await getBlogBySlug(blogSlug);
+            foundType = "SELF_REFLECTION";
             break;
-          case "JOURNALS":
-            type = "journal";
+          case "journal":
+            singleRes = await getJournalBySlug(blogSlug);
+            foundType = "JOURNALS";
             break;
-          case "LETTERS":
-            type = "letter";
+          case "letter":
+            singleRes = await getLetterBySlug(blogSlug);
+            foundType = "LETTERS";
             break;
-          case "POETRY":
-            type = "poem";
+          case "poem":
+            singleRes = await getPoemBySlug(blogSlug);
+            foundType = "POETRY";
             break;
         }
 
-        setBlog({
-          ...foundBlog,
-          category: contentType,
-          type: type,
-        });
+        if (singleRes) {
+          let data = singleRes;
+          if (data.blog) data = data.blog;
+          else if (data.journal) data = data.journal;
+          else if (data.letter) data = data.letter;
+          else if (data.poem) data = data.poem;
+          else if (data.data) data = data.data;
 
-        setRelatedPosts([]);
-      } catch (err: any) {
-        console.error("Error fetching content:", err);
-        setBlogError(err.message || "Failed to load content");
-      } finally {
-        setBlogLoading(false);
+          if (data) {
+            foundBlog = data;
+            contentType = foundType;
+          }
+        }
+      } catch (singleErr) {
+        console.warn("Type hint failed, falling back to all-search", singleErr);
       }
-    };
+    }
 
-    fetchBlog();
-  }, [blogSlug]);
+    // 2. Fallback: Fetch All
+    if (!foundBlog) {
+      const results = await Promise.allSettled([
+        getBlogBySlug(blogSlug),
+        getJournalBySlug(blogSlug),
+        getLetterBySlug(blogSlug),
+        getPoemBySlug(blogSlug),
+      ]);
+
+      const checkResult = (result: any, key: string, type: string) => {
+        if (result.status === "fulfilled" && result.value) {
+          let data = result.value;
+          if (data[key]) data = data[key];
+          else if (data.data) data = data.data;
+          
+          if (data) return { data, type };
+        }
+        return null;
+      };
+
+      const blogRes = checkResult(results[0], "blog", "SELF_REFLECTION");
+      const journalRes = checkResult(results[1], "journal", "JOURNALS");
+      const letterRes = checkResult(results[2], "letter", "LETTERS");
+      const poemRes = checkResult(results[3], "poem", "POETRY");
+
+      if (blogRes) { foundBlog = blogRes.data; contentType = blogRes.type; }
+      else if (journalRes) { foundBlog = journalRes.data; contentType = journalRes.type; }
+      else if (letterRes) { foundBlog = letterRes.data; contentType = letterRes.type; }
+      else if (poemRes) { foundBlog = poemRes.data; contentType = poemRes.type; }
+    }
+
+    if (!foundBlog) {
+      throw new Error("Content not found");
+    }
+
+    let type = "blog";
+    switch (contentType) {
+      case "SELF_REFLECTION": type = "blog"; break;
+      case "JOURNALS": type = "journal"; break;
+      case "LETTERS": type = "letter"; break;
+      case "POETRY": type = "poem"; break;
+    }
+
+    return {
+      ...foundBlog,
+      category: contentType,
+      type: type,
+    };
+  };
+
+  const {
+    data: blog,
+    isLoading: blogLoading,
+    error: queryError,
+  } = useQuery({
+    queryKey: ["story", blogSlug, typeParam],
+    queryFn: fetchStory,
+    enabled: !!blogSlug,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: false,
+  });
+
+  const blogError = (queryError as Error)?.message || null;
+  // relatedPosts logic was doing nothing, so we can ignore it or keep it empty
+  // const relatedPosts = []; 
+
 
   // NOTE: Like count is now initialized from the checkLike API response, not from blog.likes
   // which may be stale/cached data from the main blog API
@@ -228,15 +257,7 @@ const IndividualBlogPage = () => {
   }, [blog]);
 
   if (blogLoading) {
-    return (
-      <div className="min-h-screen bg-background text-text-ui flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-4xl font-garamond font-light mb-4">
-            Loading Story...
-          </h1>
-        </div>
-      </div>
-    );
+    return <BlogSkeleton />;
   }
 
   if (blogError || !blog) {

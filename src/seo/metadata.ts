@@ -68,9 +68,7 @@ export const baseMetadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  verification: {
-    google: "AofGUUujIi9sn3ldRd1IHa8tNY2uuHSm5uusmh7_upw",
-  },
+
 };
 
 /**

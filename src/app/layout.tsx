@@ -4,6 +4,7 @@ import Footer from "@/ui/footer";
 import Navbar from "@/ui/navbar";
 import "./globals.css";
 import { baseMetadata, websiteSchema, organizationSchema, siteNavigationSchema } from "@/seo/metadata";
+import QueryProvider from "@/components/QueryProvider";
 
 const ebGaramond = EB_Garamond({
   subsets: ["latin"],
@@ -20,12 +21,13 @@ export const metadata: Metadata = {
   ...baseMetadata,
   icons: {
     icon: [
-      { url: "/favicon/favicon.ico", sizes: "any" },
-      { url: "/favicon/favicon.svg", type: "image/svg+xml" },
-      { url: "/favicon/favicon-96x96.png", sizes: "96x96", type: "image/png" },
+      { url: "/favicon/favicon.ico", sizes: "any", rel: "icon" },
+      { url: "/favicon/favicon.svg", type: "image/svg+xml", rel: "icon" },
+      { url: "/favicon/favicon-96x96.png", sizes: "96x96", type: "image/png", rel: "icon" },
     ],
     apple: "/apple-icon.png",
   },
+  manifest: "/favicon/site.webmanifest",
 };
 
 export default function RootLayout({
@@ -59,9 +61,11 @@ export default function RootLayout({
       <body
         className={`${ebGaramond.variable} ${montserrat.variable} font-montserrat antialiased`}
       >
-        <Navbar />
-        {children}
-        <Footer />
+        <QueryProvider>
+          <Navbar />
+          {children}
+          <Footer />
+        </QueryProvider>
       </body>
     </html>
   );

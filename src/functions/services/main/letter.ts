@@ -14,22 +14,34 @@ export const getAllLetters = async (page = 1, limit = 9) => {
   }
 };
 
-export const getLetterBySlug = async (slug: string) => {
-  try {
-    const res = await http.get(`/api/v2/letter/by-slug/${slug}`);
-    return res.data;  
-  } catch (error) {
-    console.error("Error fetching letter ", error);
-    throw error;
-  }
-};
-
 export const getLetterById = async (id:string) => {
   try {
-    const res = await http.get(`/api/v2/letter/${id}`)
+    const res = await http.get(`/api/v2/letter/letter-id/${id}`)
     return res.data
   } catch (error) {
     console.error('Error fetching letter',error)
+    throw error
+  }
+}
+
+export const getLetterByTitle = async (title: string) => {
+  try {
+    const res = await http.get(`/api/v2/letter/letter-title/${title}`)
+    return res.data
+  } catch (error) {
+    console.error('Error fetching letter by title', error)
+    throw error
+  }
+}
+
+export const getLetterBySlug = async (slug: string) => {
+  try {
+    const res = await http.get(`/api/v2/letter/by-slug/${slug}`)
+    return res.data
+  } catch (error: any) {
+    if (error?.response?.status !== 404) {
+      console.error('Error fetching letter by slug', error)
+    }
     throw error
   }
 }
