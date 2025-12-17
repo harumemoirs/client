@@ -1,7 +1,12 @@
 /**
  * SEO Metadata Configuration for Haru Memoirs
- *
- * Centralized metadata management for consistent SEO across all pages.
+ * 
+ * Comprehensive SEO setup following Google's best practices:
+ * - Proper metadata structure
+ * - Open Graph and Twitter Card support
+ * - Structured data (Schema.org)
+ * - Canonical URLs
+ * - Proper robots directives
  */
 
 import { Metadata } from "next";
@@ -12,11 +17,11 @@ const SITE_NAME = "Haru Memoirs by Christina";
 const SITE_DESCRIPTION =
   "Inspired by Haru - the season of return. Writing from the spaces between change, where silence turns into story and moments unfold like sakura in spring. Exploring impermanence, tenderness, and belonging through seasonal reflections.";
 
-// Default OG Image - Update with your actual image URL
 const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.jpg`;
 
 /**
  * Base metadata configuration
+ * Following Next.js 13+ App Router best practices
  */
 export const baseMetadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -34,6 +39,7 @@ export const baseMetadata: Metadata = {
     address: false,
     telephone: false,
   },
+  // Open Graph metadata for social sharing
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -47,16 +53,20 @@ export const baseMetadata: Metadata = {
         width: 1200,
         height: 630,
         alt: "Haru Memoirs - Seasonal Writing and Gentle Reflections",
+        type: "image/jpeg",
       },
     ],
   },
+  // Twitter Card metadata
   twitter: {
     card: "summary_large_image",
     title: SITE_NAME,
     description: SITE_DESCRIPTION,
     images: [DEFAULT_OG_IMAGE],
     creator: "@harumemoirs",
+    site: "@harumemoirs",
   },
+  // Robots directives for search engines
   robots: {
     index: true,
     follow: true,
@@ -68,7 +78,30 @@ export const baseMetadata: Metadata = {
       "max-snippet": -1,
     },
   },
-
+  // Verification (add when you have Google Search Console verification code)
+  // verification: {
+  //   google: "your-google-verification-code",
+  // },
+  // Favicon configuration
+  // Next.js automatically converts these to <link> tags in HTML
+  // Using absolute URLs for Google Search compatibility
+  icons: {
+    icon: [
+      { url: `${SITE_URL}/favicon.ico`, sizes: "any" }, // Primary favicon
+      {
+        url: `${SITE_URL}/favicon/favicon-96x96.png`,
+        sizes: "96x96",
+        type: "image/png",
+      },
+    ],
+    shortcut: `${SITE_URL}/favicon.ico`,
+    apple: `${SITE_URL}/apple-icon.png`,
+  },
+  manifest: `${SITE_URL}/favicon/site.webmanifest`,
+  // Alternates for internationalization (if needed in future)
+  alternates: {
+    canonical: SITE_URL,
+  },
 };
 
 /**
@@ -81,6 +114,7 @@ export function generatePageMetadata({
   path = "",
   image,
   type = "website",
+  noindex = false,
 }: {
   title: string;
   description: string;
@@ -88,6 +122,7 @@ export function generatePageMetadata({
   path?: string;
   image?: string;
   type?: "website" | "article";
+  noindex?: boolean;
 }): Metadata {
   const url = `${SITE_URL}${path}`;
   const ogImage = image || DEFAULT_OG_IMAGE;
@@ -111,6 +146,7 @@ export function generatePageMetadata({
           width: 1200,
           height: 630,
           alt: title,
+          type: "image/jpeg",
         },
       ],
     },
@@ -119,12 +155,30 @@ export function generatePageMetadata({
       title,
       description,
       images: [ogImage],
+      creator: "@harumemoirs",
     },
+    robots: noindex
+      ? {
+          index: false,
+          follow: false,
+        }
+      : {
+          index: true,
+          follow: true,
+          googleBot: {
+            index: true,
+            follow: true,
+            "max-video-preview": -1,
+            "max-image-preview": "large",
+            "max-snippet": -1,
+          },
+        },
   };
 }
 
 /**
  * Generate blog post metadata with article-specific fields
+ * Following Schema.org Article schema requirements
  */
 export function generateBlogMetadata({
   title,
@@ -135,6 +189,7 @@ export function generateBlogMetadata({
   tags = [],
   image,
   slug,
+  noindex = false,
 }: {
   title: string;
   description: string;
@@ -144,14 +199,16 @@ export function generateBlogMetadata({
   tags?: string[];
   image?: string;
   slug: string;
+  noindex?: boolean;
 }): Metadata {
   const url = `${SITE_URL}/blogs/${slug}`;
   const ogImage = image || DEFAULT_OG_IMAGE;
+  const modified = modifiedTime || publishedTime;
 
   return {
     title,
     description,
-    keywords: tags,
+    keywords: tags.length > 0 ? tags : PAGE_KEYWORDS.home,
     alternates: {
       canonical: url,
     },
@@ -162,7 +219,7 @@ export function generateBlogMetadata({
       description,
       siteName: SITE_NAME,
       publishedTime,
-      modifiedTime: modifiedTime || publishedTime,
+      modifiedTime: modified,
       authors: authors,
       tags: tags,
       images: [
@@ -171,6 +228,7 @@ export function generateBlogMetadata({
           width: 1200,
           height: 630,
           alt: title,
+          type: "image/jpeg",
         },
       ],
     },
@@ -179,15 +237,32 @@ export function generateBlogMetadata({
       title,
       description,
       images: [ogImage],
+      creator: "@harumemoirs",
     },
+    robots: noindex
+      ? {
+          index: false,
+          follow: false,
+        }
+      : {
+          index: true,
+          follow: true,
+          googleBot: {
+            index: true,
+            follow: true,
+            "max-video-preview": -1,
+            "max-image-preview": "large",
+            "max-snippet": -1,
+          },
+        },
   };
 }
 
 /**
- * Structured Data Generators
+ * Structured Data Generators (Schema.org JSON-LD)
  */
 
-// Website Schema
+// Website Schema - Required for sitelinks and site search
 export const websiteSchema = {
   "@context": "https://schema.org",
   "@type": "WebSite",
@@ -199,28 +274,40 @@ export const websiteSchema = {
     name: "Christina",
   },
   inLanguage: "en-US",
+  potentialAction: {
+    "@type": "SearchAction",
+    target: {
+      "@type": "EntryPoint",
+      urlTemplate: `${SITE_URL}/blogs?search={search_term_string}`,
+    },
+    "query-input": "required name=search_term_string",
+  },
 };
 
-// Organization Schema
+// Organization Schema - Helps with brand recognition
 export const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
   name: SITE_NAME,
   url: SITE_URL,
-  logo: `${SITE_URL}/logo.png`,
+  logo: {
+    "@type": "ImageObject",
+    url: `${SITE_URL}/logo.png`,
+    width: 512,
+    height: 512,
+  },
   description: SITE_DESCRIPTION,
   founder: {
     "@type": "Person",
     name: "Christina",
   },
   sameAs: [
-    // Add your social media URLs
     "https://www.instagram.com/harumemoirs",
     "https://x.com/harumemoirs",
   ],
 };
 
-// Site Navigation Schema for Sitelinks
+// Site Navigation Schema - Helps with sitelinks
 export const siteNavigationSchema = {
   "@context": "https://schema.org",
   "@type": "ItemList",
@@ -258,7 +345,10 @@ export const siteNavigationSchema = {
   ],
 };
 
-// Blog Posting Schema Generator
+/**
+ * Blog Posting Schema Generator
+ * Following Schema.org BlogPosting requirements
+ */
 export function generateBlogPostingSchema({
   title,
   description,
@@ -267,6 +357,7 @@ export function generateBlogPostingSchema({
   image,
   slug,
   author = "Christina",
+  tags = [],
 }: {
   title: string;
   description: string;
@@ -275,13 +366,19 @@ export function generateBlogPostingSchema({
   image?: string;
   slug: string;
   author?: string;
+  tags?: string[];
 }) {
   return {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     headline: title,
     description: description,
-    image: image || DEFAULT_OG_IMAGE,
+    image: {
+      "@type": "ImageObject",
+      url: image || DEFAULT_OG_IMAGE,
+      width: 1200,
+      height: 630,
+    },
     datePublished: publishedTime,
     dateModified: modifiedTime || publishedTime,
     author: {
@@ -294,16 +391,24 @@ export function generateBlogPostingSchema({
       logo: {
         "@type": "ImageObject",
         url: `${SITE_URL}/logo.png`,
+        width: 512,
+        height: 512,
       },
     },
     mainEntityOfPage: {
       "@type": "WebPage",
       "@id": `${SITE_URL}/blogs/${slug}`,
     },
+    keywords: tags.join(", "),
+    articleSection: tags[0] || "General",
+    inLanguage: "en-US",
   };
 }
 
-// Breadcrumb Schema Generator
+/**
+ * Breadcrumb Schema Generator
+ * Helps with navigation in search results
+ */
 export function generateBreadcrumbSchema(
   items: { name: string; url: string }[]
 ) {
