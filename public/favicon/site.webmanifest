@@ -1,7 +1,18 @@
 {
-  "name": "MyWebSite",
-  "short_name": "MySite",
+  "name": "Haru Memoirs by Christina",
+  "short_name": "Haru Memoirs",
+  "description": "Inspired by Haru - the season of return. Writing from the spaces between change.",
   "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/favicon/favicon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
     {
       "src": "/favicon/web-app-manifest-192x192.png",
       "sizes": "192x192",
@@ -15,7 +26,9 @@
       "purpose": "maskable"
     }
   ],
-  "theme_color": "#ffffff",
+  "theme_color": "#5b4c3a",
   "background_color": "#ffffff",
-  "display": "standalone"
+  "display": "standalone",
+  "start_url": "/",
+  "scope": "/"
 }
