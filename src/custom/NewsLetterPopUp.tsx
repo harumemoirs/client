@@ -545,7 +545,7 @@ const NewsletterPopup: React.FC<NewsletterPopupProps> = ({
         {/* Close Button with subtle hover animation */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center text-primary-dark/60 hover:text-primary-dark hover:bg-primary-light/20 transition-all duration-200 hover:scale-110"
+          className="absolute top-4 right-4 z-20 w-10 h-10 flex items-center justify-center text-primary-dark/60 hover:text-primary-dark hover:bg-primary-light/20 transition-all duration-200 hover:scale-110"
           aria-label="Close newsletter popup"
         >
           <svg
