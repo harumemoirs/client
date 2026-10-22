@@ -10,6 +10,7 @@ import {
   siteNavigationSchema,
 } from "@/seo/metadata";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import QueryProvider from "@/components/QueryProvider";
 
 const ebGaramond = EB_Garamond({
@@ -65,6 +66,7 @@ export default function RootLayout({
           <Footer />
         </QueryProvider>
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
