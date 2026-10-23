@@ -258,22 +258,24 @@ const HomePage = () => {
               </div>
             </div>
 
-            <div className="col-span-12 xl:col-span-6 relative overflow-hidden min-h-[480px] xl:min-h-full bg-[#18130e] flex items-center justify-center">
-              <Image
-                src={IMAGES.home.author}
-                alt="Christina - Author"
-                fill
-                className="object-contain"
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                quality={85}
-                loading="lazy"
-                placeholder="blur"
-                blurDataURL={getShimmerDataUrl(800, 800)}
-              />
-              <div className="absolute bottom-6 md:bottom-8 left-6 md:left-8 text-white z-20">
-                <p className="text-xs md:text-sm font-montserrat opacity-90">
-                  "Every story is a bridge between worlds"
-                </p>
+            <div className="col-span-12 xl:col-span-6 flex items-center justify-center">
+              <div className="relative w-full aspect-square overflow-hidden">
+                <Image
+                  src={IMAGES.home.author}
+                  alt="Christina - Author"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  quality={85}
+                  loading="lazy"
+                  placeholder="blur"
+                  blurDataURL={getShimmerDataUrl(800, 800)}
+                />
+                <div className="absolute bottom-6 md:bottom-8 left-6 md:left-8 text-white z-20">
+                  <p className="text-xs md:text-sm font-montserrat opacity-90">
+                    "Every story is a bridge between worlds"
+                  </p>
+                </div>
               </div>
             </div>
           </div>
