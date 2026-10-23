@@ -4,6 +4,8 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useNavigation, ROUTES, type RouteValue } from "@/utils/navigation";
 import { usePathname } from "next/navigation";
+import { IMAGES } from "@/constants/images";
+import { getShimmerDataUrl } from "@/utils/image";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -187,11 +189,14 @@ const Footer = () => {
 
           <div className="col-span-12 md:col-span-6 lg:col-span-4 overflow-hidden relative min-h-[300px] md:min-h-full">
             <Image
-              src="https://res.cloudinary.com/dwtbvdlzg/image/upload/v1764268052/footer-1st-option_ieu0oz.jpg"
+              src={IMAGES.shared.footer}
               alt="Coastal landscape"
               fill
               className="object-cover opacity-60"
               sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              loading="lazy"
+              placeholder="blur"
+              blurDataURL={getShimmerDataUrl(600, 400)}
             />
           </div>
         </div>

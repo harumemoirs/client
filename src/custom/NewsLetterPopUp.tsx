@@ -338,6 +338,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { subscribe } from "@/functions/services/newsletter/newsletter";
+import { IMAGES } from "@/constants/images";
 
 interface NewsletterPopupProps {
   isOpen: boolean;
@@ -568,7 +569,7 @@ const NewsletterPopup: React.FC<NewsletterPopupProps> = ({
           <div className="relative overflow-hidden h-64 lg:h-auto">
             <div className="absolute inset-0 bg-primary-dark/20 z-10"></div>
             <Image
-              src="https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_800/v1764268054/newsletter_m5xiwj.jpg"
+              src={IMAGES.shared.newsletter}
               alt="Coastal writing inspiration"
               fill
               className={`object-cover transition-transform duration-700 ease-out ${

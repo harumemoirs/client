@@ -8,6 +8,8 @@ const Newsletter = dynamic(() => import("@/ui/newsletter"), {
   loading: () => <div className="min-h-[400px] bg-background animate-pulse" />,
 });
 import Link from "next/link";
+import { IMAGES } from "@/constants/images";
+import { getShimmerDataUrl } from "@/utils/image";
 import { getOrCreateBrowserId } from "@/lib/browserId";
 import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import { getAllBlogs } from "@/functions/services/main/blogs";
@@ -248,15 +250,11 @@ const BlogsPage = () => {
 
   // Hero images for each category
   const heroImages: Record<string, string> = {
-    ALL: "https://res.cloudinary.com/dwtbvdlzg/image/upload/w_1200,h_800,c_fill/v1765380884/hero-1st-left_bc863k.jpg",
-    LETTERS:
-      "https://res.cloudinary.com/dwtbvdlzg/image/upload/w_1200,h_800,c_fill/v1765552632/lavdi_n3eyiq.jpg",
-    POETRY:
-      "https://res.cloudinary.com/dwtbvdlzg/image/upload/w_1200,h_800,c_fill/v1765538787/1st-tides-of-change-2ndoption_uigzqo.jpg",
-    SELF_REFLECTION:
-      "https://res.cloudinary.com/dwtbvdlzg/image/upload/w_1200,h_800,c_fill/v1765539681/bc_ibghcv.jpg",
-    JOURNALS:
-      "https://res.cloudinary.com/dwtbvdlzg/image/upload/w_1200,h_800,c_fill/v1765539067/journal-hero_xs6ysv.jpg",
+    ALL: IMAGES.blogs.categoryHeroes.ALL,
+    LETTERS: IMAGES.blogs.categoryHeroes.LETTERS,
+    POETRY: IMAGES.blogs.categoryHeroes.POETRY,
+    SELF_REFLECTION: IMAGES.blogs.categoryHeroes.SELF_REFLECTION,
+    JOURNALS: IMAGES.blogs.categoryHeroes.JOURNALS,
   };
 
   const hasMore =
@@ -391,8 +389,10 @@ const BlogsPage = () => {
             } - Haru Memoirs`}
             fill
             className="object-cover"
-            sizes="(max-width: 1024px) 100vw, 60vw"
             priority
+            placeholder="blur"
+            blurDataURL={getShimmerDataUrl(1200, 800)}
+            sizes="(max-width: 1280px) 100vw, 60vw"
           />
         </div>
       </div>
@@ -463,12 +463,16 @@ const BlogsPage = () => {
                       src={
                         blog.imageUrls?.[0] ||
                         blog.image ||
-                        "https://res.cloudinary.com/dwtbvdlzg/image/upload/v1765380884/hero-1st-left_bc863k.jpg"
+                        IMAGES.blogs.categoryHeroes.ALL
                       }
                       alt={blog.title || "Untitled"}
                       fill
                       className="object-cover transition-transform duration-700 group-hover:scale-105"
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      loading="lazy"
+                      placeholder="blur"
+                      blurDataURL={getShimmerDataUrl(600, 450)}
+                      quality={80}
                     />
                   </div>
 
@@ -586,11 +590,15 @@ const BlogsPage = () => {
       <div className="grid grid-cols-12 border-t border-primary-light/30 gap-1">
         <div className="col-span-12 xl:col-span-6 bg-primary-dark text-white overflow-hidden relative min-h-[384px] xl:min-h-full">
           <Image
-            src="https://res.cloudinary.com/dwtbvdlzg/image/upload/v1764268082/contact-us-left-one_i9tatw.jpg"
+            src={IMAGES.blogs.shareStoryLeft}
             alt="Writing inspiration"
             fill
             className="object-cover opacity-70"
             sizes="(max-width: 1280px) 100vw, 50vw"
+            loading="lazy"
+            placeholder="blur"
+            blurDataURL={getShimmerDataUrl(800, 500)}
+            quality={80}
           />
           <div className="absolute inset-0 bg-[#5b4c3a]/40 flex items-center justify-center p-8 lg:p-12">
             <div className="text-center">
@@ -613,11 +621,15 @@ const BlogsPage = () => {
 
         <div className="col-span-12 xl:col-span-6 overflow-hidden relative min-h-[384px] xl:min-h-full">
           <Image
-            src="https://res.cloudinary.com/dwtbvdlzg/image/upload/v1764268082/contact-us-right-one_vnmcpw.jpg"
+            src={IMAGES.blogs.shareStoryRight}
             alt="Coastal heritage"
             fill
             className="object-cover"
             sizes="(max-width: 1280px) 100vw, 50vw"
+            loading="lazy"
+            placeholder="blur"
+            blurDataURL={getShimmerDataUrl(800, 500)}
+            quality={80}
           />
         </div>
       </div>

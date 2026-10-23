@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import Link from "next/link";
+import { IMAGES } from "@/constants/images";
 
 const NotFoundPage = () => {
   return (
@@ -56,7 +57,7 @@ const NotFoundPage = () => {
         <div className="col-span-12 lg:col-span-5 xl:col-span-4 relative overflow-hidden min-h-96 lg:min-h-full">
           <div className="absolute inset-0 bg-[#5b4c3a]/10"></div>
           <img
-            src="https://res.cloudinary.com/dwtbvdlzg/image/upload/v1764268054/hero-section_ynlism.jpg"
+            src={IMAGES.shared.notFound}
             alt="Lost in the seasons"
             className="w-full h-full object-cover"
           />

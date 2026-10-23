@@ -3,6 +3,8 @@ import Image from "next/image";
 import Newsletter from "@/ui/newsletter";
 import PageTransition from "@/components/PageTransition";
 import NewsletterPopupWrapper from "@/components/NewsletterPopupWrapper";
+import { IMAGES } from "@/constants/images";
+import { getShimmerDataUrl } from "@/utils/image";
 
 const HomePage = () => {
 
@@ -13,8 +15,7 @@ const HomePage = () => {
       description:
         "Moments of renewal and soft beginnings gentle verses that bloom like sakura after winter's stillness.",
       count: "Haru (Spring)",
-      image:
-        "https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_1200/v1764268053/haru-poetry-hero-section_wezfsf.jpg",
+      image: IMAGES.home.categories.poetry,
       color: "accent-cool",
     },
     {
@@ -23,8 +24,7 @@ const HomePage = () => {
       description:
         "Warm musings and wanderings letters written in sunlight, about books, travels, and fleeting joys.",
       count: "Natsu (Summer)",
-      image:
-        "https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_1200/v1764410908/hero-3rd-bottom-2ndoption_jnzptm.jpg",
+      image: IMAGES.home.categories.letters,
       color: "primary-light",
     },
     {
@@ -33,8 +33,7 @@ const HomePage = () => {
       description:
         "Thoughtful writings on change and impermanence where fading colors reveal deeper meaning.",
       count: "Aki (Autumn)",
-      image:
-        "https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_1200/v1764268173/self-reflection-hero-section_z335pj.jpg",
+      image: IMAGES.home.categories.selfReflection,
       color: "primary-dark",
     },
     {
@@ -43,8 +42,7 @@ const HomePage = () => {
       description:
         "Quiet records of solitude and peace words written beside the hush of falling snow.",
       count: "Fuyu (Winter)",
-      image:
-        "https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_1200/v1764268054/journal-hero-section_gyxsgr.jpg",
+      image: IMAGES.home.categories.journals,
       color: "primary-light",
     },
   ];
@@ -103,13 +101,15 @@ const HomePage = () => {
           <div className="col-span-12 xl:col-span-4 relative overflow-hidden min-h-[500px] xl:min-h-full">
             <div className="absolute inset-0 bg-[#5b4c3a]/10 z-10"></div>
             <Image
-              src="https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_1200/v1764268054/hero-section_ynlism.jpg"
+              src={IMAGES.home.hero}
               alt="Coastal writing inspiration"
               fill
               className="object-cover"
               priority
+              placeholder="blur"
+              blurDataURL={getShimmerDataUrl(800, 1000)}
               sizes="(max-width: 1024px) 100vw, 40vw"
-              quality={90}
+              quality={85}
             />
             <div className="absolute bottom-6 md:bottom-8 left-6 md:left-8 text-white z-20">
               <p className="text-xs md:text-sm font-montserrat uppercase tracking-wider opacity-90">
@@ -150,8 +150,10 @@ const HomePage = () => {
                       fill
                       className="object-cover transition-transform duration-700 group-hover:scale-105"
                       sizes="(max-width: 768px) 100vw, 50vw"
-                      quality={85}
+                      quality={80}
                       loading="lazy"
+                      placeholder="blur"
+                      blurDataURL={getShimmerDataUrl(600, 400)}
                     />
                   </div>
 
@@ -258,13 +260,15 @@ const HomePage = () => {
 
             <div className="col-span-12 xl:col-span-6 relative overflow-hidden min-h-[480px] xl:min-h-full">
               <Image
-                src="https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_800,h_600,c_fill/v1764664442/author_chro9a.jpg"
+                src={IMAGES.home.author}
                 alt="Christina - Author"
                 fill
                 className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 quality={85}
                 loading="lazy"
+                placeholder="blur"
+                blurDataURL={getShimmerDataUrl(800, 600)}
               />
               <div className="absolute bottom-6 md:bottom-8 left-6 md:left-8 text-white z-20">
                 <p className="text-xs md:text-sm font-montserrat opacity-90">
@@ -331,13 +335,15 @@ const HomePage = () => {
 
             <div className="col-span-12 xl:col-span-5 bg-primary-dark text-white overflow-hidden relative min-h-[320px] xl:min-h-full xl:order-first">
               <Image
-                src="https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_600,h_400,c_fill/v1764268052/contact-us-1st-option_xsblwl.jpg"
+                src={IMAGES.home.contactPreview}
                 alt="Get in touch"
                 fill
                 className="object-cover opacity-70"
                 sizes="(max-width: 1024px) 100vw, 40vw"
                 quality={80}
                 loading="lazy"
+                placeholder="blur"
+                blurDataURL={getShimmerDataUrl(600, 400)}
               />
               <div className="absolute inset-0 bg-[#5b4c3a]/50 flex items-center justify-center p-6 md:p-8 lg:p-16 z-10">
                 <div className="text-center">

@@ -4,6 +4,8 @@ import React, { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { IMAGES } from "@/constants/images";
+import { getShimmerDataUrl } from "@/utils/image";
 
 const UnsubscribeContent = () => {
   const searchParams = useSearchParams();
@@ -160,11 +162,13 @@ const UnsubscribePage = () => {
         <div className="col-span-12 xl:col-span-4 relative overflow-hidden min-h-[500px] xl:min-h-full">
           <div className="absolute inset-0 bg-[#5b4c3a]/10 z-10"></div>
           <Image
-            src="https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_1200/v1764268054/newsletter_m5xiwj.jpg"
+            src={IMAGES.shared.newsletterWide}
             alt="Newsletter - Seasonal reflections"
             fill
             className="object-cover"
             priority
+            placeholder="blur"
+            blurDataURL={getShimmerDataUrl(1200, 800)}
             sizes="(max-width: 1024px) 100vw, 40vw"
           />
           <div className="absolute bottom-6 md:bottom-8 left-6 md:left-8 text-white z-20">

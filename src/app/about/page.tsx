@@ -3,6 +3,8 @@ import Image from "next/image";
 import Newsletter from "@/ui/newsletter";
 import PageTransition from "@/components/PageTransition";
 import FAQAccordion from "@/components/FAQAccordion";
+import { IMAGES } from "@/constants/images";
+import { getShimmerDataUrl } from "@/utils/image";
 
 const AboutUsPage: React.FC = () => {
   return (
@@ -57,36 +59,40 @@ const AboutUsPage: React.FC = () => {
             <div className="grid grid-cols-2 gap-1">
               <div className="bg-[#5b4c3a]/90 overflow-hidden relative">
                 <Image
-                  src="https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_500,h_400,c_fill/v1764270160/hero-1st-left-2ndoption_vwkkk2.jpg"
+                  src={IMAGES.about.heroLeft}
                   alt="Coastal landscape"
                   fill
                   className="object-cover opacity-80"
                   sizes="(max-width: 1024px) 100vw, 25vw"
                   priority
-                  quality={90}
+                  placeholder="blur"
+                  blurDataURL={getShimmerDataUrl(500, 400)}
+                  quality={85}
                 />
               </div>
               <div className="bg-[#5b4c3a] overflow-hidden relative">
                 <Image
-                  src="https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_500,h_400,c_fill/v1764270229/hero-2nd-right-2ndoption_e5qrrp.jpg"
+                  src={IMAGES.about.heroRight}
                   alt="Writing desk"
                   fill
                   className="object-cover opacity-90"
                   sizes="(max-width: 1024px) 100vw, 25vw"
-                  priority
-                  quality={90}
+                  placeholder="blur"
+                  blurDataURL={getShimmerDataUrl(500, 400)}
+                  quality={85}
                 />
               </div>
             </div>
             <div className="bg-[#5b4c3a]/95 overflow-hidden relative">
               <Image
-                src="https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_1000/v1764270282/hero-3rd-bottom-1stoption_skluef.jpg"
+                src={IMAGES.about.heroBottom}
                 alt="Ocean horizon"
                 fill
                 className="object-cover opacity-85"
                 sizes="(max-width: 1024px) 100vw, 50vw"
-                priority
-                quality={90}
+                placeholder="blur"
+                blurDataURL={getShimmerDataUrl(1000, 500)}
+                quality={85}
               />
             </div>
           </div>
@@ -136,13 +142,15 @@ const AboutUsPage: React.FC = () => {
 
               <div className="relative min-h-[300px] xl:min-h-full">
                 <Image
-                  src="https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_800/v1764664442/author_chro9a.jpg"
+                  src={IMAGES.about.author}
                   alt="Author portrait"
                   fill
                   className="object-cover"
                   sizes="(max-width: 1280px) 100vw, 40vw"
                   quality={85}
                   loading="lazy"
+                  placeholder="blur"
+                  blurDataURL={getShimmerDataUrl(800, 1000)}
                 />
               </div>
             </div>
@@ -201,13 +209,15 @@ const AboutUsPage: React.FC = () => {
         <div className="grid grid-cols-12 border-t border-primary-light/30">
           <div className="col-span-12 xl:col-span-4 overflow-hidden relative min-h-[300px] xl:min-h-full">
             <Image
-              src="https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_800/v1764270461/portfolio-3rdoption_p6yoyt.jpg"
+              src={IMAGES.about.portfolio}
               alt="Sunset over water"
               fill
               className="object-cover"
               sizes="(max-width: 1280px) 100vw, 33vw"
               quality={85}
               loading="lazy"
+              placeholder="blur"
+              blurDataURL={getShimmerDataUrl(800, 600)}
             />
           </div>
 
@@ -284,13 +294,15 @@ const AboutUsPage: React.FC = () => {
                 <div className="bg-primary-dark/90 p-4 md:p-6 text-white overflow-hidden relative">
                   <div className="w-full h-24 md:h-32 relative mb-4">
                     <Image
-                      src="https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_600/v1764270631/about-page-services_xzbpcc.jpg"
+                      src={IMAGES.about.services}
                       alt="Writing workshop"
                       fill
                       className="object-cover opacity-90"
                       sizes="(max-width: 1280px) 100vw, 33vw"
                       quality={80}
                       loading="lazy"
+                      placeholder="blur"
+                      blurDataURL={getShimmerDataUrl(600, 300)}
                     />
                   </div>
                   <h4 className="font-montserrat text-xs uppercase tracking-wider relative z-10">
@@ -367,13 +379,15 @@ const AboutUsPage: React.FC = () => {
 
           <div className="col-span-12 lg:col-span-6 bg-primary-dark text-white overflow-hidden relative min-h-[300px] xl:min-h-full">
             <Image
-              src="https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_800,h_600,c_fill/v1764270116/get-in-touch-4thoption_koszeg.jpg"
+              src={IMAGES.about.getInTouch}
               alt="Architectural detail"
               fill
               className="object-cover opacity-70"
               sizes="(max-width: 1024px) 100vw, 50vw"
               quality={80}
               loading="lazy"
+              placeholder="blur"
+              blurDataURL={getShimmerDataUrl(800, 600)}
             />
             <div className="absolute inset-0 bg-[#5b4c3a]/40 flex items-end p-6 md:p-8 lg:p-12 xl:p-16 z-10">
               <div>
