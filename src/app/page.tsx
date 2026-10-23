@@ -263,7 +263,7 @@ const HomePage = () => {
                 src={IMAGES.home.author}
                 alt="Christina - Author"
                 fill
-                className="object-cover"
+                className="object-cover object-top"
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 quality={85}
                 loading="lazy"

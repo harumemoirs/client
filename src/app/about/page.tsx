@@ -145,7 +145,7 @@ const AboutUsPage: React.FC = () => {
                   src={IMAGES.about.author}
                   alt="Author portrait"
                   fill
-                  className="object-cover"
+                  className="object-cover object-top"
                   sizes="(max-width: 1280px) 100vw, 40vw"
                   quality={85}
                   loading="lazy"
