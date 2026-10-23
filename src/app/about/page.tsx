@@ -140,18 +140,20 @@ const AboutUsPage: React.FC = () => {
                 </p>
               </div>
 
-              <div className="relative min-h-[300px] xl:min-h-full bg-[#18130e] flex items-center justify-center">
-                <Image
-                  src={IMAGES.about.author}
-                  alt="Author portrait"
-                  fill
-                  className="object-contain"
-                  sizes="(max-width: 1280px) 100vw, 40vw"
-                  quality={85}
-                  loading="lazy"
-                  placeholder="blur"
-                  blurDataURL={getShimmerDataUrl(800, 800)}
-                />
+              <div className="flex items-center justify-center">
+                <div className="relative w-full aspect-square overflow-hidden">
+                  <Image
+                    src={IMAGES.about.author}
+                    alt="Author portrait"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 35vw"
+                    quality={85}
+                    loading="lazy"
+                    placeholder="blur"
+                    blurDataURL={getShimmerDataUrl(800, 800)}
+                  />
+                </div>
               </div>
             </div>
           </div>
