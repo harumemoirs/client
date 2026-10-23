@@ -21,7 +21,7 @@ export const IMAGES = {
         "https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_1200/v1764268054/journal-hero-section_gyxsgr.jpg",
     },
     author:
-      "https://res.cloudinary.com/dwtbvdlzg/image/upload/v1792768502/author-img-02_yt5hcv.jpg",
+      "https://res.cloudinary.com/dwtbvdlzg/image/upload/v1792771885/author-img-03_uwlvx7.png",
     contactPreview:
       "https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_600,h_400,c_fill/v1764268052/contact-us-1st-option_xsblwl.jpg",
   },
