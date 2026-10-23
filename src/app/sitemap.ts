@@ -1,7 +1,7 @@
 import { MetadataRoute } from "next";
 
-const SITE_URL = "https://harumemoirs.xyz";
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.harumemoirs.xyz";
+const SITE_URL = "https://harumemoirs.in";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.harumemoirs.in";
 
 // Revalidate sitemap every 12 hours for better freshness
 export const revalidate = 43200;

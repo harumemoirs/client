@@ -234,9 +234,9 @@ const Footer = () => {
               <p className="text-xs font-montserrat text-primary-dark/80">
                 Developed and Maintained by{" "}
                 <a
-                  href="https://www.kairosagency.xyz/"
+                  href="https://kairosartifex.site"
                   onClick={(e) =>
-                    handleExternalNavigation("https://www.kairosagency.xyz/", e)
+                    handleExternalNavigation("https://kairosartifex.site", e)
                   }
                   target="_blank"
                   rel="noopener noreferrer"

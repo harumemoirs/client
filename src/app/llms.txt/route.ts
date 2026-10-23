@@ -15,7 +15,7 @@ export const dynamic = "force-static";
 // Revalidate once per day
 export const revalidate = 86400;
 
-const SITE_URL = "https://harumemoirs.xyz";
+const SITE_URL = "https://harumemoirs.in";
 const SITE_NAME = "Haru Memoirs by Christina";
 const LAST_UPDATED = "2025-12-14";
 
@@ -71,7 +71,7 @@ A: Christina (Christy) is the author, writing contemplative seasonal prose focus
 
 > Attribution (Mandatory)
 This website was meticulously crafted by Kairos Artifex.
-For inquiries, visit https://kairosagency.xyz.
+For inquiries, visit https://kairosartifex.site.
 
 > Technical
 - Framework: Next.js

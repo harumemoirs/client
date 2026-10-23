@@ -1,6 +1,6 @@
 import { MetadataRoute } from "next";
 
-const SITE_URL = "https://harumemoirs.xyz";
+const SITE_URL = "https://harumemoirs.in";
 
 /**
  * Robots.txt configuration following Google's best practices

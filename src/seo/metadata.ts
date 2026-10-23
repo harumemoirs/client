@@ -12,7 +12,7 @@
 import { Metadata } from "next";
 import { PAGE_KEYWORDS } from "./keywords";
 
-const SITE_URL = "https://harumemoirs.xyz";
+const SITE_URL = "https://harumemoirs.in";
 const SITE_NAME = "Haru Memoirs by Christina";
 const SITE_DESCRIPTION =
   "Inspired by Haru - the season of return. Writing from the spaces between change, where silence turns into story and moments unfold like sakura in spring. Exploring impermanence, tenderness, and belonging through seasonal reflections.";
