@@ -23,8 +23,8 @@ const nextConfig = {
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     // Image sizes for different breakpoints
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    // Minimum quality for optimized images
-    minimumCacheTTL: 60,
+    // Cache optimized images aggressively (1 year)
+    minimumCacheTTL: 31536000,
     // Enable image optimization
     dangerouslyAllowSVG: false,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",

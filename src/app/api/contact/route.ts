@@ -3,8 +3,8 @@ import { Resend } from "resend";
 import { MongoClient } from "mongodb";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limiter";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-const mongo = new MongoClient(process.env.MONGODB_URI!);
+const resend = new Resend(process.env.RESEND_API_KEY || "missing_key");
+const mongo = process.env.MONGODB_URI ? new MongoClient(process.env.MONGODB_URI) : (null as unknown as MongoClient);
   
 export async function POST(req: Request) {
   try {
