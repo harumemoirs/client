@@ -1,274 +1,67 @@
-"use client";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Image from "next/image";
-import { useParams, useSearchParams } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
-import dynamic from "next/dynamic";
-
-// Lazy load Newsletter
-const Newsletter = dynamic(() => import("@/ui/newsletter"), {
-  loading: () => <div className="min-h-[400px] bg-background animate-pulse" />,
-});
 import Link from "next/link";
-import BlogSkeleton from "@/components/BlogSkeleton";
-import { getOrCreateBrowserId } from "@/lib/browserId";
-import { getBlogBySlug } from "@/functions/services/main/blogs";
-import { getJournalBySlug } from "@/functions/services/main/journal";
-import { getLetterBySlug } from "@/functions/services/main/letter";
-import { getPoemBySlug } from "@/functions/services/main/poem";
-import { toggleBlogLike, checkBlogLike } from "@/functions/services/like/blog";
-import {
-  toggleJournalLike,
-  checkJournalLike,
-} from "@/functions/services/like/journal";
-import {
-  toggleLetterLike,
-  checkLetterLike,
-} from "@/functions/services/like/letter";
-import { togglePoemLike, checkPoemLike } from "@/functions/services/like/poem";
+import type { Metadata } from "next";
+import Newsletter from "@/ui/newsletter";
+import BlogLikeButton from "@/components/BlogLikeButton";
+import { getStoryBySlug } from "@/functions/services/main/story";
+import { IMAGES } from "@/constants/images";
+import { getShimmerDataUrl } from "@/utils/image";
 
-const IndividualBlogPage = () => {
-  const params = useParams();
-  const searchParams = useSearchParams();
-  const blogSlug = params?.slug as string;
-  const typeParam = searchParams.get('type');
-  const [isLiked, setIsLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(0);
-  const [loading, setLoading] = useState(false);
+// Enable Incremental Static Regeneration (ISR)
+export const revalidate = 60;
 
-  // API states
-  // API states
-  // const [blog, setBlog] = useState<any>(null); // Replaced by useQuery
-  // const [blogLoading, setBlogLoading] = useState(true); // Replaced by useQuery
-  // const [blogError, setBlogError] = useState<string | null>(null); // Replaced by useQuery
-  const [relatedPosts, setRelatedPosts] = useState<any[]>([]);
+interface PageProps {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ type?: string }>;
+}
 
-  // --- React Query Fetch Function ---
-  const fetchStory = async () => {
-    if (!blogSlug) throw new Error("No slug provided");
+export async function generateMetadata({
+  params,
+  searchParams,
+}: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const { type } = await searchParams;
+  const story = await getStoryBySlug(slug, type);
 
-    let foundBlog = null;
-    let contentType = "";
-
-    // 1. Try Type Hint
-    if (typeParam) {
-      try {
-        let singleRes;
-        let foundType = "";
-
-        switch (typeParam) {
-          case "blog":
-            singleRes = await getBlogBySlug(blogSlug);
-            foundType = "SELF_REFLECTION";
-            break;
-          case "journal":
-            singleRes = await getJournalBySlug(blogSlug);
-            foundType = "JOURNALS";
-            break;
-          case "letter":
-            singleRes = await getLetterBySlug(blogSlug);
-            foundType = "LETTERS";
-            break;
-          case "poem":
-            singleRes = await getPoemBySlug(blogSlug);
-            foundType = "POETRY";
-            break;
-        }
-
-        if (singleRes) {
-          let data = singleRes;
-          if (data.blog) data = data.blog;
-          else if (data.journal) data = data.journal;
-          else if (data.letter) data = data.letter;
-          else if (data.poem) data = data.poem;
-          else if (data.data) data = data.data;
-
-          if (data) {
-            foundBlog = data;
-            contentType = foundType;
-          }
-        }
-      } catch (singleErr) {
-        console.warn("Type hint failed, falling back to all-search", singleErr);
-      }
-    }
-
-    // 2. Fallback: Fetch All
-    if (!foundBlog) {
-      const results = await Promise.allSettled([
-        getBlogBySlug(blogSlug),
-        getJournalBySlug(blogSlug),
-        getLetterBySlug(blogSlug),
-        getPoemBySlug(blogSlug),
-      ]);
-
-      const checkResult = (result: any, key: string, type: string) => {
-        if (result.status === "fulfilled" && result.value) {
-          let data = result.value;
-          if (data[key]) data = data[key];
-          else if (data.data) data = data.data;
-          
-          if (data) return { data, type };
-        }
-        return null;
-      };
-
-      const blogRes = checkResult(results[0], "blog", "SELF_REFLECTION");
-      const journalRes = checkResult(results[1], "journal", "JOURNALS");
-      const letterRes = checkResult(results[2], "letter", "LETTERS");
-      const poemRes = checkResult(results[3], "poem", "POETRY");
-
-      if (blogRes) { foundBlog = blogRes.data; contentType = blogRes.type; }
-      else if (journalRes) { foundBlog = journalRes.data; contentType = journalRes.type; }
-      else if (letterRes) { foundBlog = letterRes.data; contentType = letterRes.type; }
-      else if (poemRes) { foundBlog = poemRes.data; contentType = poemRes.type; }
-    }
-
-    if (!foundBlog) {
-      throw new Error("Content not found");
-    }
-
-    let type = "blog";
-    switch (contentType) {
-      case "SELF_REFLECTION": type = "blog"; break;
-      case "JOURNALS": type = "journal"; break;
-      case "LETTERS": type = "letter"; break;
-      case "POETRY": type = "poem"; break;
-    }
-
+  if (!story) {
     return {
-      ...foundBlog,
-      category: contentType,
-      type: type,
+      title: "Story Not Found | Haru Memoirs",
     };
-  };
-
-  const {
-    data: blog,
-    isLoading: blogLoading,
-    error: queryError,
-  } = useQuery({
-    queryKey: ["story", blogSlug, typeParam],
-    queryFn: fetchStory,
-    enabled: !!blogSlug,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    retry: false,
-  });
-
-  const blogError = (queryError as Error)?.message || null;
-  // relatedPosts logic was doing nothing, so we can ignore it or keep it empty
-  // const relatedPosts = []; 
-
-
-  // NOTE: Like count is now initialized from the checkLike API response, not from blog.likes
-  // which may be stale/cached data from the main blog API
-
-  // Initialize browser ID and fetch like status
-  useEffect(() => {
-    const fingerprint = getOrCreateBrowserId();
-
-    // Immediately set like count from blog data if available
-    if (blog?.likeCount !== undefined || blog?.likes !== undefined) {
-      const initialCount = parseInt(blog.likeCount || blog.likes || "0");
-      setLikeCount(initialCount);
-      console.log("📊 Initial like count from blog data:", initialCount);
-    }
-
-    // Check localStorage FIRST for instant feedback
-    let hasLocalLike = false;
-    if (fingerprint && blog?.id) {
-      const likedKey = `hm_liked_${fingerprint}_${blog.id}`;
-      hasLocalLike = localStorage.getItem(likedKey) === "true";
-      if (hasLocalLike) {
-        console.log("Found in localStorage: User has liked this post");
-        setIsLiked(true);
-      }
-    }
-
-    // Then verify with API in background
-    const fetchLikeData = async () => {
-      if (!blog?.id || !fingerprint) return;
-
-      try {
-        let status;
-
-        console.log("🔍 Checking like status with API:", {
-          blogId: blog.id,
-          blogType: blog.type,
-        });
-
-        switch (blog.type) {
-          case "blog":
-            status = await checkBlogLike(blog.id, fingerprint);
-            break;
-          case "journal":
-            status = await checkJournalLike(blog.id, fingerprint);
-            break;
-          case "letter":
-            status = await checkLetterLike(blog.id, fingerprint);
-            break;
-          case "poem":
-            status = await checkPoemLike(blog.id, fingerprint);
-            break;
-          default:
-            return;
-        }
-
-        console.log("API Response:", status);
-
-        const liked = status?.liked ?? status?.isLiked ?? false;
-        const count =
-          status?.likeCount ??
-          status?.likes ??
-          status?.totalLikes ??
-          status?.count ??
-          0;
-
-        console.log("Parsed:", { liked, count, hasLocalLike });
-
-        // IMPORTANT: Only update if API explicitly confirms, or if there's no localStorage value
-        if (liked) {
-          // API confirms liked - update state and localStorage
-          setIsLiked(true);
-          const likedKey = `hm_liked_${fingerprint}_${blog.id}`;
-          localStorage.setItem(likedKey, "true");
-        } else {
-          // Re-check localStorage to see if user liked while API was in flight
-          const likedKey = `hm_liked_${fingerprint}_${blog.id}`;
-          const currentLocalLike = localStorage.getItem(likedKey) === "true";
-
-          if (!currentLocalLike && !hasLocalLike) {
-            // API says not liked AND we don't have it in localStorage (initially or currently) - set to false
-            setIsLiked(false);
-          }
-        }
-        // If API says false but localStorage says true - KEEP localStorage (API might be wrong)
-
-        if (count > 0) setLikeCount(count);
-      } catch (error) {
-        console.error("❌ API check failed:", error);
-        // Keep localStorage state on error
-      }
-    };
-
-    if (blog && fingerprint) {
-      fetchLikeData();
-    }
-  }, [blog]);
-
-  if (blogLoading) {
-    return <BlogSkeleton />;
   }
 
-  if (blogError || !blog) {
+  const coverImage =
+    story.imageUrls?.[0] || story.image || IMAGES.blogs.fallbackCover;
+
+  return {
+    title: `${story.title} | Haru Memoirs`,
+    description: story.excerpt || "Sharing the quiet seasons of the heart.",
+    openGraph: {
+      title: story.title,
+      description: story.excerpt,
+      images: [{ url: coverImage, alt: story.title }],
+    },
+  };
+}
+
+export default async function IndividualBlogPage({
+  params,
+  searchParams,
+}: PageProps) {
+  const { slug } = await params;
+  const { type } = await searchParams;
+
+  const blog = await getStoryBySlug(slug, type);
+
+  if (!blog) {
     return (
-      <div className="min-h-screen bg-background text-text-ui flex items-center justify-center">
+      <div className="min-h-screen bg-background text-text-ui flex items-center justify-center p-6">
         <div className="text-center">
           <h1 className="text-4xl font-garamond font-light mb-4">
             Story Not Found
           </h1>
-          <p className="text-primary-dark/80 mb-8">
-            {blogError || "The story you're looking for doesn't exist."}
+          <p className="text-primary-dark/80 mb-8 max-w-md mx-auto">
+            The story you're looking for doesn't exist or may have been moved.
           </p>
           <Link
             href="/blogs"
@@ -281,62 +74,9 @@ const IndividualBlogPage = () => {
     );
   }
 
-  const handleLike = async () => {
-    if (isLiked || loading || !blog) return;
-
-    const fingerprint = getOrCreateBrowserId();
-    if (!fingerprint) return;
-
-    // setLoading(true); // Don't show loading state for optimistic update
-    setIsLiked(true);
-    setLikeCount((prev) => prev + 1);
-
-    // Save to localStorage immediately
-    const likedKey = `hm_liked_${fingerprint}_${blog.id}`;
-    localStorage.setItem(likedKey, "true");
-
-    try {
-      let result;
-
-      switch (blog.type) {
-        case "blog":
-          result = await toggleBlogLike(blog.id, fingerprint);
-          break;
-        case "journal":
-          result = await toggleJournalLike(blog.id, fingerprint);
-          break;
-        case "letter":
-          result = await toggleLetterLike(blog.id, fingerprint);
-          break;
-        case "poem":
-          result = await togglePoemLike(blog.id, fingerprint);
-          break;
-      }
-
-      const serverCount = result?.likeCount ?? result?.likes;
-      if (typeof serverCount === "number") {
-        setLikeCount(serverCount);
-      }
-      console.log("✅ Like successful!");
-    } catch (error: any) {
-      console.error("Like error:", error);
-
-      // If error says "already liked", keep the liked state
-      const errorMsg = error?.message?.toLowerCase() || "";
-      if (errorMsg.includes("already liked")) {
-        console.log("✅ Already liked - keeping liked state");
-        return; // Don't revert
-      }
-
-      // Otherwise revert
-      setIsLiked(false);
-      setLikeCount((prev) => Math.max(0, prev - 1));
-      localStorage.removeItem(likedKey);
-    }
-    // finally {
-    //   setLoading(false);
-    // }
-  };
+  const initialLikes = parseInt(String(blog.likeCount || blog.likes || "0")) || 0;
+  const coverImage =
+    blog.imageUrls?.[0] || blog.image || IMAGES.blogs.fallbackCover;
 
   return (
     <div className="min-h-screen bg-background text-text-ui">
@@ -358,39 +98,19 @@ const IndividualBlogPage = () => {
               <span className="text-xs font-montserrat uppercase tracking-wider text-primary-dark/75">
                 {blog.category?.replace("_", " ") || "STORY"}
               </span>
-              {/* Like Button */}
-              <button
-                onClick={handleLike}
-                disabled={isLiked || loading}
-                className={`flex items-center gap-2 px-4 py-2 border text-sm font-montserrat uppercase tracking-wider transition-all duration-300 ${
-                  isLiked
-                    ? "border-primary-dark bg-primary-dark text-white cursor-not-allowed"
-                    : loading
-                    ? "border-primary-light/60 text-primary-dark/75 cursor-wait opacity-50"
-                    : "border-primary-light/60 text-primary-dark/75 hover:border-primary-dark hover:text-primary-dark hover:bg-primary-light/10"
-                }`}
-              >
-                <svg
-                  className={`w-4 h-4 ${
-                    isLiked ? "fill-white" : "fill-none stroke-current"
-                  } ${loading ? "animate-pulse" : ""}`}
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
-                  />
-                </svg>
-                <span>{likeCount}</span>
-              </button>
+
+              {/* Interactive Like Button Component */}
+              <BlogLikeButton
+                blogId={blog.id}
+                blogType={blog.type || "blog"}
+                initialLikes={initialLikes}
+              />
             </div>
             <h1 className="text-4xl lg:text-5xl xl:text-6xl font-garamond font-light tracking-wider leading-tight mb-6">
               {blog.title}
             </h1>
             <div className="flex gap-6 text-sm font-montserrat uppercase tracking-wider text-primary-dark/75">
-              <span>{blog.date}</span>
+              <span>{blog.date || "SEASONAL MEMOIR"}</span>
             </div>
           </div>
 
@@ -402,7 +122,7 @@ const IndividualBlogPage = () => {
                   ABOUT THIS STORY
                 </h2>
                 <p className="text-sm leading-relaxed text-primary-dark/80">
-                  {blog.excerpt}
+                  {blog.excerpt || "A quiet season of the heart."}
                 </p>
               </div>
 
@@ -410,11 +130,13 @@ const IndividualBlogPage = () => {
               <div className="border-t border-primary-light/30 pt-8">
                 <div className="flex items-center gap-4 mb-4">
                   <Image
-                    src="https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_128,h_128,c_fill/v1764664442/author_chro9a.jpg"
+                    src={IMAGES.blogs.authorAvatar}
                     alt="Christy"
                     width={64}
                     height={64}
                     className="rounded-full object-cover w-16 h-16"
+                    placeholder="blur"
+                    blurDataURL={getShimmerDataUrl(128, 128)}
                     quality={85}
                   />
                   <div>
@@ -433,21 +155,19 @@ const IndividualBlogPage = () => {
           </div>
         </div>
 
-        {/* Right Side - Featured Image */}
+        {/* Right Side - Featured Image with High Priority */}
         <div className="col-span-12 xl:col-span-7 relative overflow-hidden">
           <div className="relative h-[50vh] xl:h-full overflow-hidden">
             <Image
-              src={
-                blog.imageUrls?.[0] ||
-                blog.image ||
-                "https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_1600/v1765380884/hero-1st-left_bc863k.jpg"
-              }
-              alt={blog.title || "Untitled"}
+              src={coverImage}
+              alt={blog.title || "Story Cover"}
               fill
               className="object-cover"
               sizes="(max-width: 1280px) 100vw, 60vw"
-              quality={90}
+              quality={85}
               priority
+              placeholder="blur"
+              blurDataURL={getShimmerDataUrl(1200, 800)}
             />
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary-dark/20 to-primary-dark/60"></div>
 
@@ -476,7 +196,6 @@ const IndividualBlogPage = () => {
         <div className="grid grid-cols-12">
           <div className="col-span-12 xl:col-span-8 p-8 lg:p-12 xl:p-16">
             <article className="max-w-4xl mx-auto prose prose-lg">
-              {/* Article Content */}
               <div className="space-y-6 overflow-hidden">
                 <div
                   className="text-base font-montserrat leading-relaxed text-text-ui whitespace-pre-wrap break-words max-w-full"
@@ -497,38 +216,9 @@ const IndividualBlogPage = () => {
               MORE STORIES
             </h2>
 
-            {relatedPosts.length > 0 ? (
-              <div className="space-y-8">
-                {relatedPosts.map((post) => (
-                  <Link
-                    key={post.id}
-                    href={`/blogs/${post.slug}`}
-                    className="group block"
-                  >
-                    <div className="border-l-2 border-primary-light/50 group-hover:border-primary-dark pl-6 transition-all duration-300">
-                      <div className="mb-2">
-                        <span className="text-xs font-montserrat uppercase tracking-wider text-primary-dark/75">
-                          {post.category.replace("_", " ")}
-                        </span>
-                      </div>
-                      <h4 className="font-garamond text-lg font-light mb-2 group-hover:text-primary-dark transition-colors duration-300">
-                        {post.title}
-                      </h4>
-                      <p className="text-xs leading-relaxed text-primary-dark/80 mb-2">
-                        {post.excerpt.slice(0, 100)}...
-                      </p>
-                      <div className="flex gap-4 text-xs font-montserrat uppercase tracking-wider text-primary-dark/75">
-                        <span>{post.date}</span>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-primary-dark/80">
-                No related stories found.
-              </p>
-            )}
+            <p className="text-sm text-primary-dark/80">
+              No related stories found.
+            </p>
 
             {/* Share Section */}
             <div className="mt-12 pt-8 border-t border-primary-light/30">
@@ -557,7 +247,7 @@ const IndividualBlogPage = () => {
 
       {/* Bottom CTA Section */}
       <div className="grid grid-cols-12 border-t gap-1 border-primary-light/30">
-        <div className="col-span-12 xl:col-span-6 bg-primary-dark text-white overflow-hidden relative">
+        <div className="col-span-12 xl:col-span-6 bg-primary-dark text-white overflow-hidden relative min-h-[384px] xl:min-h-full">
           <Image
             src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&h=600&fit=crop&auto=format&q=80"
             alt="Share your story"
@@ -565,6 +255,8 @@ const IndividualBlogPage = () => {
             className="object-cover opacity-70"
             quality={75}
             loading="lazy"
+            placeholder="blur"
+            blurDataURL={getShimmerDataUrl(800, 600)}
           />
           <div className="absolute inset-0 bg-primary-dark/40 flex items-center justify-center p-8 lg:p-12 xl:p-12">
             <div className="text-center">
@@ -593,6 +285,8 @@ const IndividualBlogPage = () => {
             className="object-cover"
             quality={75}
             loading="lazy"
+            placeholder="blur"
+            blurDataURL={getShimmerDataUrl(800, 600)}
           />
         </div>
       </div>
@@ -600,6 +294,4 @@ const IndividualBlogPage = () => {
       <Newsletter />
     </div>
   );
-};
-
-export default IndividualBlogPage;
+}
