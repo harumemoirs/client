@@ -21,7 +21,7 @@ export const IMAGES = {
         "https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_1200/v1764268054/journal-hero-section_gyxsgr.jpg",
     },
     author:
-      "https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_800,h_600,c_fill/v1764664442/author_chro9a.jpg",
+      "https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_800,h_600,c_fill/v1792768502/author-img-02_yt5hcv.jpg",
     contactPreview:
       "https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_600,h_400,c_fill/v1764268052/contact-us-1st-option_xsblwl.jpg",
   },
@@ -34,7 +34,7 @@ export const IMAGES = {
     heroBottom:
       "https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_1000/v1764270282/hero-3rd-bottom-1stoption_skluef.jpg",
     author:
-      "https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_800/v1764664442/author_chro9a.jpg",
+      "https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_800/v1792768502/author-img-02_yt5hcv.jpg",
     portfolio:
       "https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_800/v1764270461/portfolio-3rdoption_p6yoyt.jpg",
     services:
@@ -68,7 +68,7 @@ export const IMAGES = {
     shareStoryRight:
       "https://res.cloudinary.com/dwtbvdlzg/image/upload/v1764268082/contact-us-right-one_vnmcpw.jpg",
     authorAvatar:
-      "https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_128,h_128,c_fill/v1764664442/author_chro9a.jpg",
+      "https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_128,h_128,c_fill/v1792768502/author-img-02_yt5hcv.jpg",
     fallbackCover:
       "https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_1600/v1765380884/hero-1st-left_bc863k.jpg",
   },
