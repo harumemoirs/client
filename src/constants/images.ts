@@ -34,7 +34,7 @@ export const IMAGES = {
     heroBottom:
       "https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_1000/v1764270282/hero-3rd-bottom-1stoption_skluef.jpg",
     author:
-      "https://res.cloudinary.com/dwtbvdlzg/image/upload/v1792768502/author-img-02_yt5hcv.jpg",
+      "https://res.cloudinary.com/dwtbvdlzg/image/upload/v1792771885/author-img-03_uwlvx7.png",
     portfolio:
       "https://res.cloudinary.com/dwtbvdlzg/image/upload/f_auto,q_auto,w_800/v1764270461/portfolio-3rdoption_p6yoyt.jpg",
     services:
