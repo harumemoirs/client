@@ -148,8 +148,8 @@ const UnsubscribePage = () => {
         </div>
 
         {/* Right Side - Image */}
-        <div className="col-span-12 xl:col-span-4 relative overflow-hidden min-h-[500px] xl:min-h-full">
-          <div className="absolute inset-0 bg-[#5b4c3a]/10 z-10"></div>
+        <div className="col-span-12 xl:col-span-4 relative overflow-hidden min-h-125 xl:min-h-full">
+          <div className="absolute inset-0 bg-heading-accent/10 z-10"></div>
           <Image
             src={IMAGES.shared.newsletterWide}
             alt="Newsletter - Seasonal reflections"
