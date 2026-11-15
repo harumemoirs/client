@@ -1,6 +1,6 @@
 import axios from "axios"
 const http = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_URL || "https://api.harumemoirs.in",
+    baseURL: process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "https://api.harumemoirs.in",
     headers:{
         "Content-Type":"application/json"
     }
