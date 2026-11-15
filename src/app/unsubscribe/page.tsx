@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { IMAGES } from "@/constants/images";
 import { getShimmerDataUrl } from "@/utils/image";
+import { unsubscribe as unsubscribeApi } from "@/functions/services/newsletter/newsletter";
 
 const UnsubscribeContent = () => {
   const searchParams = useSearchParams();
@@ -21,28 +22,16 @@ const UnsubscribeContent = () => {
       return;
     }
 
-    const unsubscribe = async () => {
+    const performUnsubscribe = async () => {
       try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/v2/newsletter/unsubscribe`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ email }),
-          }
-        );
-
-        if (!res.ok) throw new Error("Failed");
-
+        await unsubscribeApi(email);
         setStatus("success");
       } catch {
         setStatus("error");
       }
     };
 
-    unsubscribe();
+    performUnsubscribe();
   }, [email]);
 
   if (status === "loading") {

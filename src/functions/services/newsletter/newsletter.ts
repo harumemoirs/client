@@ -48,3 +48,10 @@ export const subscribe = async (email: string) => {
     throw new Error(error.message || "Failed to subscribe");
   }
 };
+
+export const unsubscribe = async (email: string) => {
+  const { data } = await http.post("/api/v2/newsletter/unsubscribe", {
+    email,
+  });
+  return data;
+};
