@@ -1,5 +1,6 @@
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import Newsletter from "@/ui/newsletter";
 import PageTransition from "@/components/PageTransition";
 import NewsletterPopupWrapper from "@/components/NewsletterPopupWrapper";
@@ -79,19 +80,19 @@ const HomePage = () => {
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 md:gap-6">
-                  <a
+                  <Link
                     href="/blogs"
                     className="group relative px-6 md:px-8 py-3 md:py-4 bg-primary-dark text-white font-montserrat text-xs md:text-sm uppercase tracking-wider transition-all duration-300 hover:bg-text-ui text-center"
                   >
                     <span className="relative z-10">EXPLORE BLOGS</span>
                     <div className="absolute inset-0 bg-accent-warm transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
-                  </a>
-                  <a
+                  </Link>
+                  <Link
                     href="/about"
                     className="px-6 md:px-8 py-3 md:py-4 border border-primary-dark text-primary-dark font-montserrat text-xs md:text-sm uppercase tracking-wider hover:bg-primary-dark hover:text-white transition-all duration-300 text-center"
                   >
                     ABOUT CHRISTINA
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>
