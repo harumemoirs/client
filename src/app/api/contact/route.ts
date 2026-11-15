@@ -67,7 +67,7 @@ export async function POST(req: Request) {
     if (resend) {
       await resend.emails.send({
         to: "harumemoirs@gmail.com",
-        from: "onboarding@resend.dev",
+        from: process.env.EMAIL_FROM || "Haru Memoirs Contact <onboarding@resend.dev>",
         subject: `New contact form submission: ${subject || "No Subject"}`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
