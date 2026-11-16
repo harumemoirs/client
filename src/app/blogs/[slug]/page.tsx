@@ -41,6 +41,12 @@ export async function generateMetadata({
       description: story.excerpt,
       images: [{ url: coverImage, alt: story.title }],
     },
+    twitter: {
+      card: "summary_large_image",
+      title: story.title,
+      description: story.excerpt || "Sharing the quiet seasons of the heart.",
+      images: [coverImage],
+    },
   };
 }
 
